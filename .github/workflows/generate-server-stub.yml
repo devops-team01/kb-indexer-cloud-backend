@@ -1,0 +1,42 @@
+name: Regenerate Python Flask Server Stub
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'python-flask-server-generated/swagger/swagger.yaml'
+  pull_request:
+    branches:
+      - master
+    paths:
+      - 'python-flask-server-generated/swagger/swagger.yaml'
+jobs:
+  regenerate-stub:
+    runs-on: ubuntu-latest
+    name: Create Branch, Regenerate Server Stub, and Commit
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+      
+      - name: Create New Branch
+        run: |
+          BRANCH_NAME="auto-generated-stub-$(date +%Y-%m-%d-%H-%M-%S)"
+          git checkout -b $BRANCH_NAME
+
+      - name: Regenerate Server Stub
+        uses: openapi-generators/openapitools-generator-action@v1
+        with:
+          generator: python-flask
+          openapi-file: python-flask-server-generated/swagger/swagger.yaml
+          #config-file: path/to/your/config-file.yml 
+          output: python-flask-server-generated 
+
+      - name: Commit and Push Changes to New Branch
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add python-flask-server-generated/
+          git commit -m "Automatically regenerate Python Flask server stub" -a || echo "No changes to commit"
+          git push --set-upstream origin $BRANCH_NAME
