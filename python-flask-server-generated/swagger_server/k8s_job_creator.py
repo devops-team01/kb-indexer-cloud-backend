@@ -38,6 +38,7 @@ def create_kubernetes_job(job_name: str, command: List[str], image: str, schedul
         name=job_name,
         image=image,
         command=command
+        ,image_pull_policy="IfNotPresent"
     )
 
     # Define the template for the job
