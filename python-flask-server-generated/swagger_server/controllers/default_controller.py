@@ -13,8 +13,10 @@ from swagger_server import util
 import datetime
 import uuid
 
+from swagger_server.rq_config import q
+
 from swagger_server.db_config import db
-from swagger_server.k8s_job_creator import create_kubernetes_job
+from swagger_server.k8s_job import create_kubernetes_job, remove_job
 from flask import jsonify
 def indexers_get():  # noqa: E501
     """List all available indexers.
@@ -84,7 +86,27 @@ def jobs_job_id_delete(job_id):  # noqa: E501
 
     :rtype: None
     """
-    return 'do some magic!'
+
+    current_job = db.jobs.find_one({"_id": job_id})
+    
+    if not current_job:
+        # Job not found
+        error_response = Error(code=404, message="Job not found")
+        return jsonify(error_response.to_dict()), 404
+
+    # if current_job.get("status") == "being removed":
+    #     # Job is already being removed
+    #     job = q.enqueue(remove_job, job_id, False)        
+    #     return  Error(code=202, message="Job is already being removed"), 202
+    else:
+        # Update the job's status to "being removed"
+        db.jobs.update_one(
+            {"_id": job_id},
+            {"$set": {"status": "being removed"}}
+        )
+        # TODO check if repeat
+        job = q.enqueue(remove_job, job_id, False)
+        return jsonify({"message": "Job deletion initiated"}), 202
 
 
 def jobs_job_id_get(job_id):  # noqa: E501
@@ -133,9 +155,8 @@ def jobs_post(body):  # noqa: E501
 
             db.jobs.insert_one(body)
 
-            #TODO spawn kubernetes job or chronjob
             docker_image = "kb-indexer:latest"
-            
+            # TODO check if repeat
             create_kubernetes_job(job_id, [command], docker_image)
 
 

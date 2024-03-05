@@ -104,12 +104,17 @@ $(document).ready(function() {
             var jobsList = $('#jobsList');
             jobsList.empty(); // Clear current list
             response.data.forEach(function(job) {
-                var jobElement = $('<div class="card mt-2"><div class="card-body">' +
-                    '<h5 class="card-title">Job ID: ' + job._id + '</h5>' +
-                    '<p class="card-text">Status: ' + job.status + '</p>' +
-                    '</div></div>');
+                var jobElement = $(`
+                    <div class="card mt-2">
+                        <div class="card-body">
+                            <h5 class="card-title">Job ID: ${job._id}</h5>
+                            <p class="card-text">Status: ${job.status}</p>
+                            <button class="btn btn-danger btn-sm float-right delete-job" data-job-id="${job._id}">Delete</button>
+                        </div>
+                    </div>`);
                 jobsList.append(jobElement);
             });
+            attachDeleteEvent();
         })
         .catch(function(error) {
             console.error("Error loading jobs:", error.response ? error.response.data : error);
@@ -145,6 +150,23 @@ function submitJob() {
             alert("Failed to submit job. Check console for details.");
         });
 }
+
+function attachDeleteEvent() {
+    $('.delete-job').click(function() {
+        var jobId = $(this).data('job-id');
+        if (confirm('Are you sure you want to delete this job?')) {
+            axios.delete('/jobs/' + jobId)
+                .then(function(response) {
+                    loadJobs(); // Refresh the list of jobs
+                })
+                .catch(function(error) {
+                    console.error("Error deleting job:", error.response ? error.response.data : error);
+                    alert("Failed to delete job. Check console for details.");
+                });
+        }
+    });
+}
+
 });
 </script>
 </body>
