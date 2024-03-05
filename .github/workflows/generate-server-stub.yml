@@ -31,6 +31,9 @@ jobs:
           generator: python-flask
           openapi-file: python-flask-server-generated/swagger_server/swagger/swagger.yaml
           output: python-flask-server-generated 
+     
+      - name: Move Generated Directory
+        run: mv python-flask-client/ python-flask-server-generated/
 
       - name: Commit and Push Changes to New Branch
         run: |
