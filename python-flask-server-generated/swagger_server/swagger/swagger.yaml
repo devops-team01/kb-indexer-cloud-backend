@@ -203,17 +203,27 @@ components:
         id: id
     Job:
       required:
-      - jobConfiguration
-      - jobId
+        - jobId
+        - jobConfiguration
       type: object
       properties:
         jobId:
           type: string
-          description: Unique identifier for the job
+          description: Unique identifier for the job, also used as the database identifier
         jobConfiguration:
           $ref: '#/components/schemas/JobConfiguration'
+        creationTimestamp:
+          type: string
+          format: date-time
+          description: Timestamp when the job was created
+        status:
+          type: string
+          description: Current status of the job
+        generatedCommand:
+          type: string
+          description: The generated command if the job was created with a configuration
       example:
-        jobId: jobId
+        jobId: "507f1f77bcf86cd799439011"
         jobConfiguration:
           repeat: repeat
           indexerConfiguration:
@@ -230,6 +240,9 @@ components:
               id: id
               type: type
           command: command
+        creationTimestamp: "2024-03-05T08:40:51.620Z"
+        status: initializing
+        generatedCommand: ls
     JobConfiguration:
       required:
       - command
