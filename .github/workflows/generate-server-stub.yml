@@ -34,6 +34,9 @@ jobs:
      
       - name: Move Generated Directory
         run: mv python-flask-client/ python-flask-server-generated/
+      
+      - name: Set autoSetupRemote for Git
+        run: git config --global push.autoSetupRemote origin
 
       - name: Commit and Push Changes to New Branch
         run: |
