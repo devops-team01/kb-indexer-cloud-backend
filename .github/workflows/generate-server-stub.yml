@@ -3,12 +3,12 @@ name: Regenerate Python Flask Server Stub
 on:
   push:
     branches:
-      - master
+      - main
     paths:
       - 'python-flask-server-generated/swagger/swagger.yaml'
   pull_request:
     branches:
-      - master
+      - main
     paths:
       - 'python-flask-server-generated/swagger/swagger.yaml'
 jobs:
