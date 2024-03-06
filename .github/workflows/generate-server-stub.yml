@@ -32,9 +32,6 @@ jobs:
           openapi-file: swagger_server/swagger/swagger.yaml
           output: python-flask-server-generated 
      
-      - name: Move Generated Directory
-        run: mv python-flask-client/ 
-      
       - name: Set autoSetupRemote for Git
         run: git config --global push.autoSetupRemote true
 
