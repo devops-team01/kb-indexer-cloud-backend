@@ -223,7 +223,7 @@ components:
           type: string
           description: The generated command if the job was created with a configuration
       example:
-        jobId: "507f1f77bcf86cd799439011"
+        jobId: "507f1f77bcf86cd799439012"
         jobConfiguration:
           repeat: repeat
           indexerConfiguration:
