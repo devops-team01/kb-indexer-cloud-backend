@@ -94,18 +94,18 @@ def jobs_job_id_delete(job_id):  # noqa: E501
         error_response = Error(code=404, message="Job not found")
         return jsonify(error_response.to_dict()), 404
 
-    # if current_job.get("status") == "being removed":
-    #     # Job is already being removed
+    if current_job.get("status") == "being removed":
+        # Job is already being removed
     #     job = q.enqueue(remove_job, job_id, False)        
-    #     return  Error(code=202, message="Job is already being removed"), 202
+        return  Error(code=202, message="Job is already being removed"), 202
     else:
         # Update the job's status to "being removed"
+        # TODO check if repeat
+        job = q.enqueue(remove_job, job_id, False)
         db.jobs.update_one(
             {"_id": job_id},
             {"$set": {"status": "being removed"}}
         )
-        # TODO check if repeat
-        job = q.enqueue(remove_job, job_id, False)
         return jsonify({"message": "Job deletion initiated"}), 202
 
 
