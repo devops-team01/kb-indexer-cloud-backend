@@ -3,10 +3,10 @@ name: Regenerate Python Flask Server Stub
 on:
   push:
     paths:
-      - 'swagger_server/swagger/swagger.yaml'
+      - 'openapi_server/openapi/openapi.yaml'
   pull_request:
     paths:
-      - 'swagger_server/swagger/swagger.yaml'
+      - 'openapi_server/openapi/openapi.yaml'
 jobs:
   regenerate-stub:
     runs-on: ubuntu-latest
@@ -25,8 +25,7 @@ jobs:
         uses: openapi-generators/openapitools-generator-action@v1
         with:
           generator: python-flask
-          openapi-file: swagger_server/swagger/swagger.yaml
-          output: python-flask-server-generated 
+          openapi-file: 'openapi_server/openapi/openapi.yaml'
      
       - name: Set autoSetupRemote for Git
         run: git config --global push.autoSetupRemote true
