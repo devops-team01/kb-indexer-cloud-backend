@@ -4,7 +4,7 @@ from typing import List, Optional, Union
 from kubernetes.client.models.v1_job import V1Job
 from kubernetes.client.models.v1_cron_job import V1CronJob
 import time
-from swagger_server.db_config import db
+from openapi_server.db_config import db
 # TODO code clone
 def create_kubernetes_job(job_name: str, command: List[str], image: str, schedule: Optional[str] = None) -> Union[V1Job, V1CronJob]:
     """

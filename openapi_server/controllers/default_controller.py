@@ -1,22 +1,22 @@
 import connexion
 import six
 
-from swagger_server.models.data_source import DataSource  # noqa: E501
-from swagger_server.models.error import Error  # noqa: E501
-from swagger_server.models.indexer import Indexer  # noqa: E501
-from swagger_server.models.inline_response201 import InlineResponse201  # noqa: E501
-from swagger_server.models.job import Job  # noqa: E501
-from swagger_server.models.job_configuration import JobConfiguration  # noqa: E501
-from swagger_server.models.record import Record  # noqa: E501
-from swagger_server import util
+from openapi_server.models.data_source import DataSource  # noqa: E501
+from openapi_server.models.error import Error  # noqa: E501
+from openapi_server.models.indexer import Indexer  # noqa: E501
+from openapi_server.models.inline_response201 import InlineResponse201  # noqa: E501
+from openapi_server.models.job import Job  # noqa: E501
+from openapi_server.models.job_configuration import JobConfiguration  # noqa: E501
+from openapi_server.models.record import Record  # noqa: E501
+from openapi_server import util
 
 import datetime
 import uuid
 
-from swagger_server.rq_config import q
+from openapi_server.rq_config import q
 
-from swagger_server.db_config import db
-from swagger_server.k8s_job import create_kubernetes_job, remove_job
+from openapi_server.db_config import db
+from openapi_server.k8s_job import create_kubernetes_job, remove_job
 from flask import jsonify
 def indexers_get():  # noqa: E501
     """List all available indexers.

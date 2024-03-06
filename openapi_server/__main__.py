@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
 
 import connexion
-from swagger_server import encoder
+from openapi_server import encoder
 
 from pymongo import MongoClient
 # from flask_socketio import SocketIO
 from flask import send_from_directory
 
 def main():
-    app = connexion.App(__name__, specification_dir='./swagger/')
+    app = connexion.App(__name__, specification_dir='./openapi/')
     app.app.json_encoder = encoder.JSONEncoder
-    app.add_api('swagger.yaml', arguments={'title': 'kb-indexer API'}, pythonic_params=True)
+    app.add_api('openapi.yaml', arguments={'title': 'kb-indexer API'}, pythonic_params=True)
     
     
     @app.route('/')

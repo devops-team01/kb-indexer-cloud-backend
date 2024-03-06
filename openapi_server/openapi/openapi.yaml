@@ -1,98 +1,96 @@
 openapi: 3.0.0
 info:
-  title: kb-indexer API
   description: This is an API for managing kb-indexer jobs
+  title: kb-indexer API
   version: 1.0.0
 servers:
-- url: /
-  description: Local API Server
-
+- description: Local API Server
+  url: /
 paths:
   /indexers:
     get:
-      summary: List all available indexers.
       operationId: indexers_get
       responses:
         "200":
-          description: Successfully listed all indexers
           content:
             application/json:
               schema:
-                type: array
                 items:
                   $ref: '#/components/schemas/Indexer'
+                type: array
                 x-content-type: application/json
+          description: Successfully listed all indexers
+      summary: List all available indexers.
       x-openapi-router-controller: swagger_server.controllers.default_controller
   /indexers/{indexerType}/dataSources:
     get:
-      summary: List all data sources for a specific indexer type
       operationId: indexers_indexer_type_data_sources_get
       parameters:
-      - name: indexerType
+      - explode: false
         in: path
+        name: indexerType
         required: true
-        style: simple
-        explode: false
         schema:
           type: string
+        style: simple
       responses:
         "200":
-          description: Successfully listed data sources for the indexer
           content:
             application/json:
               schema:
-                type: array
                 items:
                   $ref: '#/components/schemas/DataSource'
+                type: array
                 x-content-type: application/json
+          description: Successfully listed data sources for the indexer
+      summary: List all data sources for a specific indexer type
       x-openapi-router-controller: swagger_server.controllers.default_controller
   /indexers/{indexerType}/dataSources/{dataSourceId}/records:
     get:
-      summary: List all records for a specific data source of an indexer
       operationId: indexers_indexer_type_data_sources_data_source_id_records_get
       parameters:
-      - name: indexerType
+      - explode: false
         in: path
+        name: indexerType
         required: true
-        style: simple
-        explode: false
         schema:
           type: string
-      - name: dataSourceId
-        in: path
-        required: true
         style: simple
-        explode: false
+      - explode: false
+        in: path
+        name: dataSourceId
+        required: true
         schema:
           type: string
+        style: simple
       responses:
         "200":
-          description: Successfully listed records for the data source
           content:
             application/json:
               schema:
-                type: array
                 items:
                   $ref: '#/components/schemas/Record'
+                type: array
                 x-content-type: application/json
+          description: Successfully listed records for the data source
+      summary: List all records for a specific data source of an indexer
       x-openapi-router-controller: swagger_server.controllers.default_controller
   /jobs:
     get:
-      summary: List the jobs
       operationId: jobs_get
       responses:
         "200":
-          description: Successfully listed jobs
           content:
             application/json:
               schema:
-                type: array
                 items:
                   $ref: '#/components/schemas/Job'
+                type: array
                 x-content-type: application/json
+          description: Successfully listed jobs
+      summary: List the jobs
       x-openapi-router-controller: swagger_server.controllers.default_controller
     post:
-      summary: Create a new job with a command or configuration
       operationId: jobs_post
       requestBody:
         content:
@@ -102,128 +100,112 @@ paths:
         required: true
       responses:
         "201":
-          description: Job successfully created
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/inline_response_201'
+          description: Job successfully created
         "400":
-          description: Invalid request body
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+          description: Invalid request body
+      summary: Create a new job with a command or configuration
       x-openapi-router-controller: swagger_server.controllers.default_controller
   /jobs/{jobId}:
-    get:
-      summary: Get a job's details
-      operationId: jobs_job_id_get
-      parameters:
-      - name: jobId
-        in: path
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-      responses:
-        "200":
-          description: Successfully retrieved job details
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Job'
-        "404":
-          description: Job not found
-      x-openapi-router-controller: swagger_server.controllers.default_controller
     delete:
-      summary: Delete a job
       operationId: jobs_job_id_delete
       parameters:
-      - name: jobId
+      - explode: false
         in: path
+        name: jobId
         required: true
-        style: simple
-        explode: false
         schema:
           type: string
+        style: simple
       responses:
         "204":
           description: Successfully deleted the job
         "404":
           description: Job not found
+      summary: Delete a job
+      x-openapi-router-controller: swagger_server.controllers.default_controller
+    get:
+      operationId: jobs_job_id_get
+      parameters:
+      - explode: false
+        in: path
+        name: jobId
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Job'
+          description: Successfully retrieved job details
+        "404":
+          description: Job not found
+      summary: Get a job's details
       x-openapi-router-controller: swagger_server.controllers.default_controller
 components:
   schemas:
     Indexer:
-      type: object
-      properties:
-        id:
-          type: string
-          description: Unique identifier for the indexer
-        type:
-          type: string
-          description: "Type of the indexer (API, web, notebook, dataset, etc.)"
       example:
         id: id
         type: type
-    DataSource:
-      type: object
       properties:
         id:
+          description: Unique identifier for the indexer
           type: string
-          description: Unique identifier for the data source
         type:
+          description: "Type of the indexer (API, web, notebook, dataset, etc.)"
           type: string
-          description: "Type of the data source (e.g., Climate_API, Environment_API,\
-            \ etc.)"
-        description:
-          type: string
-          description: Description of the data source
+      title: Indexer
+      type: object
+    DataSource:
       example:
         description: description
         id: id
         type: type
-    Record:
-      type: object
       properties:
         id:
+          description: Unique identifier for the data source
           type: string
-          description: Unique identifier for the record
-        name:
+        type:
+          description: "Type of the data source (e.g., Climate_API, Environment_API,\
+            \ etc.)"
           type: string
-          description: Name of the record
-        details:
-          type: object
-          additionalProperties: true
-          description: Detailed information about the record
+        description:
+          description: Description of the data source
+          type: string
+      title: DataSource
+      type: object
+    Record:
       example:
         name: name
         details: ""
         id: id
-    Job:
-      required:
-        - jobId
-        - jobConfiguration
-      type: object
       properties:
-        jobId:
+        id:
+          description: Unique identifier for the record
           type: string
-          description: Unique identifier for the job, also used as the database identifier
-        jobConfiguration:
-          $ref: '#/components/schemas/JobConfiguration'
-        creationTimestamp:
+        name:
+          description: Name of the record
           type: string
-          format: date-time
-          description: Timestamp when the job was created
-        status:
-          type: string
-          description: Current status of the job
-        generatedCommand:
-          type: string
-          description: The generated command if the job was created with a configuration
+        details:
+          additionalProperties: true
+          description: Detailed information about the record
+          type: object
+      title: Record
+      type: object
+    Job:
       example:
-        jobId: "507f1f77bcf86cd799439013"
+        jobId: 507f1f77bcf86cd799439011
         jobConfiguration:
           repeat: repeat
           indexerConfiguration:
@@ -240,23 +222,31 @@ components:
               id: id
               type: type
           command: command
-        creationTimestamp: "2022-03-05T08:40:51.620Z"
+        creationTimestamp: 2022-03-05T08:40:51.620Z
         status: initializing
         generatedCommand: ls
-    JobConfiguration:
-      required:
-      - command
-      type: object
       properties:
-        command:
+        jobId:
+          description: "Unique identifier for the job, also used as the database identifier"
           type: string
-          description: Shell command used to run the job
-        indexerConfiguration:
-          $ref: '#/components/schemas/IndexerConfiguration'
-        repeat:
+        jobConfiguration:
+          $ref: '#/components/schemas/JobConfiguration'
+        creationTimestamp:
+          description: Timestamp when the job was created
+          format: date-time
           type: string
-          description: "Optional field for how often the task should repeat (e.g.,\
-            \ hourly, daily, weekly)"
+        status:
+          description: Current status of the job
+          type: string
+        generatedCommand:
+          description: The generated command if the job was created with a configuration
+          type: string
+      required:
+      - jobConfiguration
+      - jobId
+      title: Job
+      type: object
+    JobConfiguration:
       example:
         repeat: repeat
         indexerConfiguration:
@@ -273,27 +263,23 @@ components:
             id: id
             type: type
         command: command
-      oneOf:
-      - required:
-        - command
-      - required:
-        - indexerConfiguration
-    IndexerConfiguration:
-      type: object
+      nullable: true
+      oneOf: []
       properties:
-        indexer:
-          $ref: '#/components/schemas/Indexer'
-        dataSource:
-          $ref: '#/components/schemas/DataSource'
-        record:
-          $ref: '#/components/schemas/Record'
-        pipeline:
+        command:
+          description: Shell command used to run the job
           type: string
-          description: "Which pipeline to run (search, index, or pipeline)"
-          enum:
-          - search
-          - index
-          - pipeline
+        indexerConfiguration:
+          $ref: '#/components/schemas/IndexerConfiguration'
+        repeat:
+          description: "Optional field for how often the task should repeat (e.g.,\
+            \ hourly, daily, weekly)"
+          type: string
+      required:
+      - command
+      title: JobConfiguration
+      type: object
+    IndexerConfiguration:
       description: "Configuration details if the job uses an indexer, optional dataSource,\
         \ and optional record"
       example:
@@ -309,27 +295,44 @@ components:
           description: description
           id: id
           type: type
-    Error:
-      type: object
       properties:
-        code:
-          type: integer
-          description: Error code
-          format: int32
-        message:
+        indexer:
+          $ref: '#/components/schemas/Indexer'
+        dataSource:
+          $ref: '#/components/schemas/DataSource'
+        record:
+          $ref: '#/components/schemas/Record'
+        pipeline:
+          description: "Which pipeline to run (search, index, or pipeline)"
+          enum:
+          - search
+          - index
+          - pipeline
           type: string
-          description: Error message
+      title: IndexerConfiguration
+      type: object
+    Error:
       example:
         code: 400
         message: Invalid request body provided
-    inline_response_201:
-      required:
-      - jobId
-      type: object
       properties:
-        jobId:
+        code:
+          description: Error code
+          format: int32
+          type: integer
+        message:
+          description: Error message
           type: string
-          description: Unique identifier for the newly created job
+      title: Error
+      type: object
+    inline_response_201:
       example:
         jobId: jobId
-
+      properties:
+        jobId:
+          description: Unique identifier for the newly created job
+          type: string
+      required:
+      - jobId
+      title: inline_response_201
+      type: object
