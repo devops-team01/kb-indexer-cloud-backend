@@ -155,7 +155,7 @@ def jobs_post(body):  # noqa: E501
 
             db.jobs.insert_one(body)
 
-            docker_image = "kb-indexer:latest"
+            docker_image = "qcdis/kb-indexer:latest"
             # TODO check if repeat
             create_kubernetes_job(job_id, [command], docker_image)
 
