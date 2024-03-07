@@ -287,24 +287,16 @@ components:
       title: Job
       type: object
     JobConfiguration:
-      example:
-        repeat: repeat
-        indexerConfiguration:
-          pipeline: search
-          record:
-            name: name
-            details: ""
-            id: id
-          indexer:
-            id: id
-            type: type
-          dataSource:
-            description: description
-            id: id
-            type: type
-        command: command
-      nullable: true
-      oneOf: []
+      type: object
+      oneOf:
+        - required: [command]
+          properties:
+            command:
+              type: string
+        - required: [indexerConfiguration]
+          properties:
+            indexerConfiguration:
+              $ref: '#/components/schemas/IndexerConfiguration'
       properties:
         command:
           description: Shell command used to run the job
@@ -312,13 +304,8 @@ components:
         indexerConfiguration:
           $ref: '#/components/schemas/IndexerConfiguration'
         repeat:
-          description: "Optional field for how often the task should repeat (e.g.,\
-            \ hourly, daily, weekly)"
+          description: "Optional field for how often the task should repeat (e.g., hourly, daily, weekly)"
           type: string
-      required:
-      - command
-      title: JobConfiguration
-      type: object
     IndexerConfiguration:
       description: "Configuration details if the job uses an indexer, optional dataSource,\
         \ and optional record"
