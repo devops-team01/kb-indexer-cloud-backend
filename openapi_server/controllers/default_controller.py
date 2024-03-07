@@ -186,7 +186,8 @@ def jobs_post(body):  # noqa: E501
 
             return InlineResponse201(job_id=job_id), 201
         
-        return Error(code=400, message="Invalid request body, missing command or jobConfiguration"), 400
+        return jsonify({"code": 400, "message": "Invalid request body, missing command or jobConfiguration"}), 400
     else:
-        return Error(code=400, message="Invalid, request body is not json "), 400
+        return jsonify({"code": 400, "message": "Invalid, request body is not json"}), 400
+
 
