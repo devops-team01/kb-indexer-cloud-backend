@@ -109,12 +109,14 @@ $(document).ready(function() {
                         <div class="card-body">
                             <h5 class="card-title">Job ID: ${job._id}</h5>
                             <p class="card-text">Status: ${job.status}</p>
+                            <button class="btn btn-warning btn-sm float-right request-update" data-job-id="${job._id}">Update Logs</button>
                             <button class="btn btn-danger btn-sm float-right delete-job" data-job-id="${job._id}">Delete</button>
                         </div>
                     </div>`);
                 jobsList.append(jobElement);
             });
             attachDeleteEvent();
+            attachRequestUpdateEvent(); 
         })
         .catch(function(error) {
             console.error("Error loading jobs:", error.response ? error.response.data : error);
@@ -165,6 +167,27 @@ function attachDeleteEvent() {
                 });
         }
     });
+}
+
+function attachRequestUpdateEvent() {
+    $('.request-update').click(function() {
+        var jobId = $(this).data('job-id');
+        $(this).html(`<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Updating...`).attr('disabled', true);
+        requestLogsUpdate(jobId, $(this)); // Pass the button element for UI updates
+    });
+}
+
+function requestLogsUpdate(jobId, buttonElement) {
+    axios.post(`/jobs/${jobId}/request-logs-update`)
+        .then(function(response) {
+            alert(`Log update request: ${response.data.message}`);
+            buttonElement.html('Update Logs').attr('disabled', false);
+        })
+        .catch(function(error) {
+            console.error("Error requesting log update:", error.response ? error.response.data : error);
+            alert("Failed to request log update. Check console for details.");
+            buttonElement.html('Update Logs').attr('disabled', false);
+        });
 }
 
 });

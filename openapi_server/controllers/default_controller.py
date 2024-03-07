@@ -122,6 +122,18 @@ def jobs_job_id_get(job_id):  # noqa: E501
     return 'do some magic!'
 
 
+def jobs_job_id_request_logs_update_post(job_id):  # noqa: E501
+    """Requests an update to the logs for a specific job without providing a request body.
+
+     # noqa: E501
+
+    :param job_id: The unique identifier for the job for which the log update is requested.
+    :type job_id: str
+
+    :rtype: Union[JobsJobIdRequestLogsUpdatePost200Response, Tuple[JobsJobIdRequestLogsUpdatePost200Response, int], Tuple[JobsJobIdRequestLogsUpdatePost200Response, int, Dict[str, str]]
+    """
+    return 'do some magic!'
+
 def jobs_post(body):  # noqa: E501
     """Create a new job with a command or configuration
 
