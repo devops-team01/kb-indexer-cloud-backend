@@ -33,10 +33,10 @@
             <label for="jobType">Job Type</label>
             <select class="form-control" id="jobType">
               <option value="manual">Command</option>
-              <option value="auto">Choose indexer</option>
+              <option value="auto" selected="selected">Choose indexer</option>
             </select>
           </div>
-          <div class="form-group" id="manualFields">
+          <div class="form-group" id="manualFields" style="display: none;">
             <label for="commandInput">Command</label>
             <input type="text" class="form-control" id="commandInput" placeholder="Enter command">
             <div class="form-check mt-2">
@@ -50,9 +50,12 @@
             </div>
           </div>
           <!-- Placeholder for automatic job configuration -->
-          <div class="form-group" id="autoFields" style="display: none;">
+          <div class="form-group" id="autoFields">
+            <label for="indexer-type-select">Indexer type</label>
             <select class="form-control" id="indexer-type-select">
             </select>
+            <label for="record-filter">Filter by record (optional)</label>
+            <input type="text" class="form-control" id="record-filter" placeholder="Enter record to index">
           </div>
         </form>
       </div>
@@ -68,6 +71,7 @@
 $(document).ready(function() {
     // Load jobs
     loadJobs();
+    loadIndexers();
 
     // Show Create Job Modal
     $('#createJobBtn').click(function() {
@@ -131,8 +135,10 @@ function loadIndexers() {
             var indexerList = $('#indexer-type-select');
             indexerList.empty(); // Clear current list
             response.data.forEach(function(indexer) {
-                var indexerElement = $(`<option value="${indexer.type}">${indexer.type}</option>`);
-                indexerList.append(jobElement);
+                var indexerElement = $(`<option>${indexer.type}</option>`);
+                indexerElement.val(indexer.type);
+                indexerElement.data("indexer", indexer)
+                indexerList.append(indexerElement);
             });
             attachDeleteEvent();
             attachRequestUpdateEvent(); 
@@ -147,21 +153,24 @@ function loadIndexers() {
 function submitJob() {
     var jobType = $('#jobType').val();
     var command = $('#commandInput').val();
-    var indexer = $('#indexer-type-select').val();
+    var indexer = $('#indexer-type-select').find(':selected').data('indexer');
     var repeat = $('#repeatCheck').is(':checked');
     var repeatFrequency = $('#repeatFrequency').val();
+    var record = $('record-filter').val()
+
+    console.log(indexer);
 
     // Construct job payload
     var payload = {
-        type: jobType,
+        // type: jobType,
         command: command
     };
 
     if (jobType == 'auto') {
-        payload.jobConfiguration = {
-                    indexer: indexer,
-                    argument: '',
-                    action: 'pipeline'
+        payload.indexerConfiguration = {
+                    indexer: JSON.stringify(indexer),
+                    record: {name: record, details: "", id: ""},
+                    pipeline: 'pipeline'
                 }
     }
 

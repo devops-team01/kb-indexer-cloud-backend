@@ -162,10 +162,11 @@ def jobs_post(body):  # noqa: E501
         
         if 'command' in body:
             command = body['command']
-        elif 'jobConfiguration' in body:
-            config = body['jobConfiguration']
-            command = f"kb_indexer {config['indexer']} {config['argument']} {config['action']}"
+        elif 'indexerConfiguration' in body:
+            config = body['indexerConfiguration']
+            command = f"kb_indexer {config['indexer']} {f"r- config['record']" if not config['record'] else ''} {config['action']}"
             body.update({'generatedCommand' : re.sub(' +', ' ', command)})
+            print(f"Sending job with body: {body}")
 
         if command:
             job_id = str(uuid.uuid4())
@@ -179,7 +180,7 @@ def jobs_post(body):  # noqa: E501
 
             docker_image = "qcdis/kb-indexer:latest"
             # TODO check if repeat
-            create_kubernetes_job(job_id, [command], docker_image)
+            create_kubernetes_job(job_id, command.split(' '), docker_image)
 
 
 
