@@ -2,7 +2,7 @@
 
 import connexion
 from openapi_server import encoder
-from db_config import db, insert_initial_values
+from openapi_server.db_config import db, insert_initial_values
 # from flask_socketio import SocketIO
 from flask import send_from_directory
 
