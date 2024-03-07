@@ -1,5 +1,6 @@
 import connexion
 import six
+import logging
 import re
 from openapi_server.models.data_source import DataSource  # noqa: E501
 from openapi_server.models.error import Error  # noqa: E501
@@ -159,14 +160,15 @@ def jobs_post(body):  # noqa: E501
     if connexion.request.is_json:
         body = connexion.request.get_json()
         command = None
-        
-        if 'command' in body:
-            command = body['command']
-        elif 'indexerConfiguration' in body:
+
+        if 'indexerConfiguration' in body:
             config = body['indexerConfiguration']
-            command = f"kb_indexer {config['indexer']} {f"r- config['record']" if not config['record'] else ''} {config['action']}"
-            body.update({'generatedCommand' : re.sub(' +', ' ', command)})
-            print(f"Sending job with body: {body}")
+            command = f"kb_indexer {config['indexer']['type']} {f"r- config['record']" if not config['record'] else ''} {config['pipeline']}"
+            command = re.sub(' +', ' ', command)
+            body.update({'generatedCommand' : command})
+            logging.getLogger().info(f"Sending job with body: {body}")
+        elif 'command' in body:
+            command = body['command']
 
         if command:
             job_id = str(uuid.uuid4())
@@ -186,8 +188,7 @@ def jobs_post(body):  # noqa: E501
 
             return InlineResponse201(job_id=job_id), 201
         
-        return jsonify({"code": 400, "message": "Invalid request body, missing command or jobConfiguration"}), 400
+        return Error(code=400, message="Invalid request body, missing command or jobConfiguration"), 400
     else:
-        return jsonify({"code": 400, "message": "Invalid, request body is not json"}), 400
-
+        return Error(code=400, message="Invalid, request body is not json "), 400
 

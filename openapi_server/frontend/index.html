@@ -161,17 +161,17 @@ function submitJob() {
     console.log(indexer);
 
     // Construct job payload
-    var payload = {
-        // type: jobType,
-        command: command
-    };
+    var payload = {};
 
     if (jobType == 'auto') {
         payload.indexerConfiguration = {
-                    indexer: JSON.stringify(indexer),
-                    record: {name: record, details: "", id: ""},
+                    indexer: indexer,
+                    record: {name: record, id: record, details: {}},
                     pipeline: 'pipeline'
                 }
+    }
+    else {
+        payload.command = command;
     }
 
     // Add repeat information if applicable
