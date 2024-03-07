@@ -21,7 +21,7 @@ paths:
                 x-content-type: application/json
           description: Successfully listed all indexers
       summary: List all available indexers.
-      x-openapi-router-controller: swagger_server.controllers.default_controller
+      x-openapi-router-controller: openapi_server.controllers.default_controller
   /indexers/{indexerType}/dataSources:
     get:
       operationId: indexers_indexer_type_data_sources_get
@@ -44,7 +44,7 @@ paths:
                 x-content-type: application/json
           description: Successfully listed data sources for the indexer
       summary: List all data sources for a specific indexer type
-      x-openapi-router-controller: swagger_server.controllers.default_controller
+      x-openapi-router-controller: openapi_server.controllers.default_controller
   /indexers/{indexerType}/dataSources/{dataSourceId}/records:
     get:
       operationId: indexers_indexer_type_data_sources_data_source_id_records_get
@@ -74,7 +74,7 @@ paths:
                 x-content-type: application/json
           description: Successfully listed records for the data source
       summary: List all records for a specific data source of an indexer
-      x-openapi-router-controller: swagger_server.controllers.default_controller
+      x-openapi-router-controller: openapi_server.controllers.default_controller
   /jobs:
     get:
       operationId: jobs_get
@@ -89,7 +89,7 @@ paths:
                 x-content-type: application/json
           description: Successfully listed jobs
       summary: List the jobs
-      x-openapi-router-controller: swagger_server.controllers.default_controller
+      x-openapi-router-controller: openapi_server.controllers.default_controller
     post:
       operationId: jobs_post
       requestBody:
@@ -112,7 +112,7 @@ paths:
                 $ref: '#/components/schemas/Error'
           description: Invalid request body
       summary: Create a new job with a command or configuration
-      x-openapi-router-controller: swagger_server.controllers.default_controller
+      x-openapi-router-controller: openapi_server.controllers.default_controller
   /jobs/{jobId}:
     delete:
       operationId: jobs_job_id_delete
@@ -130,7 +130,7 @@ paths:
         "404":
           description: Job not found
       summary: Delete a job
-      x-openapi-router-controller: swagger_server.controllers.default_controller
+      x-openapi-router-controller: openapi_server.controllers.default_controller
     get:
       operationId: jobs_job_id_get
       parameters:
@@ -151,9 +151,10 @@ paths:
         "404":
           description: Job not found
       summary: Get a job's details
-      x-openapi-router-controller: swagger_server.controllers.default_controller
+      x-openapi-router-controller: openapi_server.controllers.default_controller
   /jobs/{jobId}/request-logs-update:
     post:
+      operationId: jobs_job_id_request_logs_update_post
       parameters:
       - name: jobId
         in: path
@@ -188,6 +189,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
       summary: Requests an update to the logs for a specific job without providing a request body.
+      x-openapi-router-controller: openapi_server.controllers.default_controller
+
 
 components:
   schemas:
