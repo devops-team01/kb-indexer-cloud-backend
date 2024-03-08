@@ -15,19 +15,14 @@ on:
 jobs:
   generate-code:
     runs-on: ubuntu-latest
-    container:
-      image: swaggerapi/swagger-codegen-cli:latest
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
 
     - name: Generate API server stubs
-      run: |
-        swagger-codegen-cli generate \
-          -i /github/workspace/src/api.yml \
-          -l python-flask \
-          -o /github/workspace/src-gen \
-          -t /github/workspace/codegen/templates
+      uses: docker://swaggerapi/swagger-codegen-cli-v3:latest
+      with:
+        args: generate -i /github/workspace/src/api.yml -l python-flask -o /github/workspace/src-gen -t /github/workspace/codegen/templates
 
     - name: Commit and push generated code
       run: |
