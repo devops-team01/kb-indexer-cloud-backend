@@ -16,7 +16,7 @@ jobs:
   generate-code:
     runs-on: ubuntu-latest
     container:
-      image: swaggerapi/swagger-codegen-cli-v3
+      image: swaggerapi/swagger-codegen-cli:latest
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
