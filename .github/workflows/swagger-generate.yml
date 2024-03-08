@@ -2,9 +2,13 @@ name: Swagger Code Generation
 
 on:
   push:
+    branches:
+      - fix_generate
     paths:
       - 'src/api.yml'
   pull_request:
+    branches:
+      - fix_generate
     paths:
       - 'src/api.yml'
 
