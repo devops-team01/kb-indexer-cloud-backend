@@ -172,3 +172,43 @@ def remove_job(job_name: str, is_cronjob: Optional[bool] = False) -> str:
     # # Once confirmed that the job no longer exists, delete the job record from MongoDB
     db.jobs.delete_one({"_id": job_name})
     return f"Successfully deleted job {job_name} from Kubernetes and MongoDB."
+
+
+# TODO, put all jobs in their own namespace
+def get_job_logs(job_name: str, namespace: str = "default") -> str:
+    """
+    Retrieve logs for all Pods associated with a given Kubernetes Job, with each log line
+    prefixed with "Logs for Pod: {pod_name}".
+
+    :param job_name: The name of the Kubernetes Job.
+    :type job_name: str
+    :param namespace: The namespace in which the Job is running. Defaults to 'default'.
+    :type namespace: str
+    :return: Logs from all Pods associated with the Job, with each line prefixed.
+    :rtype: str
+    """
+    # Load kubeconfig
+    try:
+        config.load_kube_config()  # For local development
+    except Exception:
+        config.load_incluster_config()  # For use within a Kubernetes cluster
+
+    api_instance = client.CoreV1Api()
+
+    try:
+        # Retrieve all Pods in the namespace
+        pods = api_instance.list_namespaced_pod(namespace=namespace, label_selector=f"job-name={job_name}")
+        all_logs = []
+        for pod in pods.items:
+            # For each Pod, retrieve its logs
+            pod_log = api_instance.read_namespaced_pod_log(name=pod.metadata.name, namespace=namespace)
+            # prefix each line with "Logs for Pod: {pod_name}"
+            prefixed_log_lines = [f"Logs for Pod {pod.metadata.name}: {line}" for line in pod_log.splitlines()]
+            all_logs.append("\n".join(prefixed_log_lines) + "\n\n")
+        return "".join(all_logs)
+    except ApiException as e:
+        if e.status == 404:
+            # should never trigger
+            return f"No Pods found for Job {job_name} in namespace {namespace}."
+        else:
+            raise
