@@ -15,7 +15,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag $REPO_NAME/$IMAGE_NAME:latest
+      run: tar -czh . | docker build - -f src-gen/Dockerfile --tag $REPO_NAME/$IMAGE_NAME:latest
     - name: Login to Container Registry
       uses: docker/login-action@v1
       with:
