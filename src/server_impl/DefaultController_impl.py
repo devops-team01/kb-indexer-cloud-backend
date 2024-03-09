@@ -119,7 +119,13 @@ def jobs_job_id_get(job_id):  # noqa: E501
 
     :rtype: Job
     """
-    return 'do some magic!'
+    job = db.jobs.find_one({"_id": job_id})
+    
+    if job:
+        job['_id'] = str(job['_id'])
+        return jsonify(job)
+    else:
+        return Error(code=404, message="Job not found"), 404
 
 
 def jobs_job_id_request_logs_update_post(job_id):  # noqa: E501
@@ -146,7 +152,8 @@ def jobs_job_id_request_logs_update_post(job_id):  # noqa: E501
         
         return jsonify({"message": "Logs updated successfully", "logs": logs}), 200
     except Exception as e:
-        error_response = Error(code=500, message=f"An error occurred while updating logs: {str(e)}")
+        print(f"An error occurred while updating logs: {str(e)}")
+        error_response = Error(code=500, message=f"An error occurred while updating logs")
         return jsonify(error_response.to_dict()), 500
 
 def jobs_post(body):  # noqa: E501

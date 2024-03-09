@@ -200,11 +200,10 @@ def get_job_logs(job_name: str, namespace: str = "default") -> str:
         pods = api_instance.list_namespaced_pod(namespace=namespace, label_selector=f"job-name={job_name}")
         all_logs = []
         for pod in pods.items:
-            # For each Pod, retrieve its logs
+            # Retrieve logs for each Pod
             pod_log = api_instance.read_namespaced_pod_log(name=pod.metadata.name, namespace=namespace)
-            # prefix each line with "Logs for Pod: {pod_name}"
-            prefixed_log_lines = [f"Logs for Pod {pod.metadata.name}: {line}" for line in pod_log.splitlines()]
-            all_logs.append("\n".join(prefixed_log_lines) + "\n\n")
+            # Insert a header for each Pod's logs
+            all_logs.append(f"Logs for Pod {pod.metadata.name}:\n" + pod_log + "\n\n")
         return "".join(all_logs)
     except ApiException as e:
         if e.status == 404:
