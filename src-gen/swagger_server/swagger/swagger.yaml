@@ -261,7 +261,7 @@ components:
           type: string
           description: The generated command if the job was created with a configuration
       example:
-        jobId: 507f1f77bcf86cd799439013
+        jobId: 507f1f77bcf86cd799439014
         jobConfiguration:
           repeat: repeat
           indexerConfiguration:
@@ -278,7 +278,7 @@ components:
               id: id
               type: type
           command: command
-        creationTimestamp: 2022-03-05T19:40:51.632Z
+        creationTimestamp: 2022-03-05T19:40:51.532Z
         status: initializing
         generatedCommand: ls
     JobConfiguration:
