@@ -1,7 +1,8 @@
 import connexion
 import six
 
-from swagger_server.server_impl.DefaultController_impl import DefaultController_impl
+import swagger_server.server_impl.DefaultController_impl as DefaultController_impl
+
 
 from swagger_server.models.data_source import DataSource  # noqa: E501
 from swagger_server.models.error import Error  # noqa: E501
