@@ -6,6 +6,8 @@ info:
 servers:
 - url: /
   description: Local API Server
+security:
+- BearerAuth: []
 paths:
   /indexers:
     get:
@@ -278,7 +280,7 @@ components:
               id: id
               type: type
           command: command
-        creationTimestamp: 2022-03-05T19:40:51.532Z
+        creationTimestamp: 2022-03-05T19:40:51.533Z
         status: initializing
         generatedCommand: ls
     JobConfiguration:
@@ -384,4 +386,10 @@ components:
           - denied
       example:
         message: success
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      x-bearerInfoFunc: swagger_server.controllers.authorization_controller.check_BearerAuth
 

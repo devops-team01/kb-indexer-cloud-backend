@@ -6,6 +6,8 @@ info:
 servers:
 - description: Local API Server
   url: /
+security:
+  - BearerAuth: []
 paths:
   /indexers:
     get:
@@ -262,7 +264,7 @@ components:
               id: id
               type: type
           command: command
-        creationTimestamp: 2022-03-05T19:40:51.532Z
+        creationTimestamp: 2022-03-05T19:40:51.533Z
         status: initializing
         generatedCommand: ls
       properties:
@@ -376,3 +378,8 @@ components:
       - jobId
       title: inline_response_201
       type: object
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
