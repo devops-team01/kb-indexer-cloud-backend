@@ -2,7 +2,7 @@ import connexion
 import six
 import logging
 import re
-
+from flask import current_app
 from swagger_server.models.data_source import DataSource  # noqa: E501
 from swagger_server.models.error import Error  # noqa: E501
 from swagger_server.models.indexer import Indexer  # noqa: E501
@@ -11,6 +11,8 @@ from swagger_server.models.job import Job  # noqa: E501
 from swagger_server.models.job_configuration import JobConfiguration  # noqa: E501
 from swagger_server.models.record import Record  # noqa: E501
 from swagger_server import util
+from swagger_server.models.environment_variable import EnvironmentVariable  # noqa: E501
+
 
 import datetime
 import uuid
@@ -165,7 +167,7 @@ def jobs_job_id_request_logs_update_post(job_id):  # noqa: E501
         
         return jsonify({"message": "Logs updated successfully", "logs": logs}), 200
     except Exception as e:
-        print(f"An error occurred while updating logs: {str(e)}")
+        current_app.logger.warn(f"An error occurred while updating logs:{e}")
         error_response = Error(code=500, message=f"An error occurred while updating logs")
         return jsonify(error_response.to_dict()), 500
 
@@ -197,6 +199,14 @@ def jobs_post(body):  # noqa: E501
             logging.getLogger().info(f"Sending job with body: {body}")
         elif 'command' in body:
             command = body['command']
+        
+        env = None
+        if 'environment_variables' in body:
+            try :
+                env = body['environment_variables']
+            except Exception as e:
+                print(e)
+                return Error(code=400, message="Invalid environment_variables in request body"), 400
 
         if command:
             job_id = str(uuid.uuid4())
@@ -210,7 +220,7 @@ def jobs_post(body):  # noqa: E501
 
             docker_image = "qcdis/kb-indexer:latest"
             # TODO check if repeat
-            create_kubernetes_job(job_id, command.split(' '), docker_image)
+            create_kubernetes_job(job_id, command, docker_image, env)
 
 
 
@@ -220,3 +230,25 @@ def jobs_post(body):  # noqa: E501
     else:
         return Error(code=400, message="Invalid, request body is not json "), 400
 
+def environment_variables_get():
+    """Get environment variables
+
+     # noqa: E501
+
+
+    :rtype: List[EnvironmentVariable]
+    """
+    return jsonify(list( db.environment_variables.find({}, {'_id': 0})))
+
+
+def environment_variables_post(body):
+    """Add new environment variables
+
+     # noqa: E501
+
+    :param body: 
+    :type body: list | bytes
+
+    :rtype: None
+    """
+    for variable in body:db.environment_variables.insert_one(variable)
