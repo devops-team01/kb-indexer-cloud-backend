@@ -1,0 +1,31 @@
+name: Swagger Code Generation
+
+on:
+  push:
+    paths:
+      - 'src/api.yml'
+      - 'codegen'
+  pull_request:
+    paths:
+      - 'src/api.yml'
+      - 'codegen'
+
+jobs:
+  generate-code:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Generate API server stubs
+      uses: docker://swaggerapi/swagger-codegen-cli-v3:latest
+      with:
+        args: generate -i /github/workspace/src/api.yml -l python-flask -o /github/workspace/src-gen -t /github/workspace/codegen/templates
+
+    - name: Commit and push generated code
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add src-gen/*
+        git commit -m "Automatically regenerate server stubs" -a || echo "No changes to commit"
+        git push

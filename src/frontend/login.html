@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+    <form id="loginForm">
+        <input type="text" name="username" placeholder="Username" required>
+        <input type="password" name="password" placeholder="Password" required>
+        <button type="submit">Login</button>
+    </form>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var loginForm = document.querySelector('#loginForm');
+        loginForm.onsubmit = function(e) {
+            e.preventDefault();
+
+            var formData = new FormData(loginForm);
+            var object = {};
+            formData.forEach((value, key) => {object[key] = value});
+            var json = JSON.stringify(object);
+
+            axios.post('/login', json, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }).then(function(response) {
+                // Store the JWT token in localStorage
+                localStorage.setItem('jwtToken', response.data.access_token);
+                // Redirect to the index page
+                window.location.href = '/';
+            }).catch(function(error) {
+                alert('Login failed!');
+                console.error('Login error:', error);
+            });
+        };
+    });
+    </script>
+</body>
+</html>
