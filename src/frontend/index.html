@@ -144,7 +144,11 @@ $(document).ready(function() {
 }
 
 function loadIndexers() {
-    axios.get('/indexers')
+    axios.get('/indexers' , {
+        headers: {
+            'Authorization': 'Bearer ' + localStorage.getItem('jwtToken')
+        }
+    })
         .then(function(response) {
             var indexerList = $('#indexer-type-select');
             indexerList.empty(); // Clear current list
