@@ -16,7 +16,7 @@ import uuid
 from swagger_server.server_impl.rq_config import q
 
 from swagger_server.server_impl.db_config import db
-from swagger_server.server_impl.k8s_job import create_kubernetes_job, remove_job
+from swagger_server.server_impl.k8s_job import create_kubernetes_job, remove_job, get_job_logs
 from flask import jsonify
 def indexers_get():  # noqa: E501
     """List all available indexers.
@@ -119,7 +119,13 @@ def jobs_job_id_get(job_id):  # noqa: E501
 
     :rtype: Job
     """
-    return 'do some magic!'
+    job = db.jobs.find_one({"_id": job_id})
+    
+    if job:
+        job['_id'] = str(job['_id'])
+        return jsonify(job)
+    else:
+        return Error(code=404, message="Job not found"), 404
 
 
 def jobs_job_id_request_logs_update_post(job_id):  # noqa: E501
@@ -132,7 +138,23 @@ def jobs_job_id_request_logs_update_post(job_id):  # noqa: E501
 
     :rtype: Union[JobsJobIdRequestLogsUpdatePost200Response, Tuple[JobsJobIdRequestLogsUpdatePost200Response, int], Tuple[JobsJobIdRequestLogsUpdatePost200Response, int, Dict[str, str]]
     """
-    return 'do some magic!'
+    job = db.jobs.find_one({"_id": job_id})
+    
+    if not job:
+        return Error(code=404, message="Job not found"), 404
+
+    try:
+        # retrieve the latest logs for the job
+        logs = get_job_logs(job_id)
+        
+        # Update the job entry in the database with the retrieved logs
+        db.jobs.update_one({"_id": job_id}, {"$set": {"logs": logs}})
+        
+        return jsonify({"message": "Logs updated successfully", "logs": logs}), 200
+    except Exception as e:
+        print(f"An error occurred while updating logs: {str(e)}")
+        error_response = Error(code=500, message=f"An error occurred while updating logs")
+        return jsonify(error_response.to_dict()), 500
 
 def jobs_post(body):  # noqa: E501
     """Create a new job with a command or configuration

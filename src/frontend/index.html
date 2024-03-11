@@ -107,10 +107,21 @@ $(document).ready(function() {
                 var jobElement = $(`
                     <div class="card mt-2">
                         <div class="card-body">
-                            <h5 class="card-title">Job ID: ${job._id}</h5>
-                            <p class="card-text">Status: ${job.status}</p>
-                            <button class="btn btn-warning btn-sm float-right request-update" data-job-id="${job._id}">Update Logs</button>
-                            <button class="btn btn-danger btn-sm float-right delete-job" data-job-id="${job._id}">Delete</button>
+                            <div class="row">
+                                <!-- Job Info and Actions -->
+                                <div class="col-md-6">
+                                    <h5 class="card-title">Job ID: ${job._id}</h5>
+                                    <p class="card-text">Status: ${job.status}</p>
+                                    <button class="btn btn-danger btn-sm delete-job" data-job-id="${job._id}">Delete</button>
+                                    <button class="btn btn-warning btn-sm request-update ml-2" data-job-id="${job._id}">Update Logs</button>
+                                </div>
+                                <!-- Log Display -->
+                                <div class="col-md-6">
+                                    <div class="logs-container" style="max-height: 200px; overflow-y: auto;">
+                                        ${job.logs ? `<pre>${job.logs}</pre>` : '<p>No logs available</p>'}
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>`);
                 jobsList.append(jobElement);
@@ -123,6 +134,7 @@ $(document).ready(function() {
             alert("Failed to load jobs. Check console for details.");
         });
 }
+
 
 function submitJob() {
     var jobType = $('#jobType').val();
@@ -178,16 +190,39 @@ function attachRequestUpdateEvent() {
 }
 
 function requestLogsUpdate(jobId, buttonElement) {
+    // Start the spinner
+    buttonElement.html(`<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Updating...`).attr('disabled', true);
+
     axios.post(`/jobs/${jobId}/request-logs-update`)
         .then(function(response) {
-            alert(`Log update request: ${response.data.message}`);
-            buttonElement.html('Update Logs').attr('disabled', false);
+            // Wait for 5 seconds before fetching the updated job details
+            setTimeout(function() {
+                // Fetch updated job details
+                axios.get(`/jobs/${jobId}`)
+                    .then(function(response) {
+                        // Update the job element with new logs
+                        updateJobElement(jobId, response.data);
+                        buttonElement.html('Update Logs').attr('disabled', false);
+                    })
+                    .catch(function(error) {
+                        console.error("Error fetching updated job details:", error.response ? error.response.data : error);
+                        alert("Failed to fetch updated job details. Check console for details.");
+                        buttonElement.html('Update Logs').attr('disabled', false);
+                    });
+            }, 5000);
         })
         .catch(function(error) {
             console.error("Error requesting log update:", error.response ? error.response.data : error);
             alert("Failed to request log update. Check console for details.");
             buttonElement.html('Update Logs').attr('disabled', false);
         });
+}
+
+function updateJobElement(jobId, jobData) {
+    // Find the job element by jobId or a unique identifier set for the job's card
+    var jobElement = $(`[data-job-id="${jobId}"]`).closest('.card');
+    // Update the logs container inside this job's card
+    jobElement.find('.logs-container').html(jobData.logs ? `<pre>${jobData.logs}</pre>` : '<p>No logs available</p>');
 }
 
 });
