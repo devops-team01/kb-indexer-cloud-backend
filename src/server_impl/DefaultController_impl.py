@@ -188,15 +188,15 @@ def jobs_post(body):  # noqa: E501
 
         if 'indexerConfiguration' in body:
             config = body['indexerConfiguration']
-            command = f"kb_indexer {config['indexer']['type']} {f"r- config['record']" if not config['record'] else ''} {config['pipeline']}"
+
+            record_option = f"r-{config['record']}" if config['record'] else ''
+            command = f"kb_indexer {config['indexer']['type']} {record_option} {config['pipeline']}".strip()
+
             command = re.sub(' +', ' ', command)
             body.update({'generatedCommand' : command})
             logging.getLogger().info(f"Sending job with body: {body}")
         elif 'command' in body:
             command = body['command']
-        elif 'jobConfiguration' in body:
-            command = "ls" # TODO convert jobConfiguration to command
-            body.update({'generatedCommand' : command})
 
         if command:
             job_id = str(uuid.uuid4())
