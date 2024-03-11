@@ -12,6 +12,8 @@ def main():
     app.add_api('swagger.yaml', arguments={'title': 'kb-indexer API'}, pythonic_params=True)
     
     app.app.config['JWT_SECRET_KEY'] = "super-secret"  # Change this!
+    app.app.secret_key = "super-secret"  # Change this!
+
     jwt = JWTManager(app.app)
 
     app.app.register_blueprint(main_bp)
