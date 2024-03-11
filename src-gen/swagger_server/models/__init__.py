@@ -4,6 +4,7 @@
 from __future__ import absolute_import
 # import models into model package
 from swagger_server.models.data_source import DataSource
+from swagger_server.models.environment_variable import EnvironmentVariable
 from swagger_server.models.error import Error
 from swagger_server.models.indexer import Indexer
 from swagger_server.models.indexer_configuration import IndexerConfiguration

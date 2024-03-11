@@ -189,6 +189,36 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
       x-openapi-router-controller: swagger_server.controllers.default_controller
+  /environment_variables:
+    get:
+      summary: Get environment variables
+      operationId: environment_variables_get
+      responses:
+        "200":
+          description: A list of environment variables
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EnvironmentVariable'
+                x-content-type: application/json
+      x-openapi-router-controller: swagger_server.controllers.default_controller
+    post:
+      summary: Add new environment variables
+      operationId: environment_variables_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/EnvironmentVariable'
+        required: true
+      responses:
+        "200":
+          description: Environment variables created
+      x-openapi-router-controller: swagger_server.controllers.default_controller
 components:
   schemas:
     Indexer:
@@ -363,6 +393,16 @@ components:
           description: Unique identifier for the newly created job
       example:
         jobId: jobId
+    EnvironmentVariable:
+      type: object
+      properties:
+        name:
+          type: string
+        value:
+          type: string
+      example:
+        name: name
+        value: value
     inline_response_200:
       required:
       - message
