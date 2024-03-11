@@ -6,9 +6,9 @@ def check_BearerAuth_impl(token):
         # Flask-JWT-Extended's function to verify the JWT present in the current request
         verify_jwt_in_request()
         #  get the user's identity from the JWT
-        # user_identity = get_jwt_identity()
-        return True
+        user_identity = get_jwt_identity()
+        # return True
         # If verification succeeds the user object
-        # return user_identity
+        return {'user': user_identity}
     except Exception as e:
         raise OAuthProblem('Invalid token: ' + str(e))
