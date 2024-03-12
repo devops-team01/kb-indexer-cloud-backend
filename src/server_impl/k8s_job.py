@@ -6,7 +6,7 @@ from kubernetes.client.models.v1_cron_job import V1CronJob
 import time
 from swagger_server.server_impl.db_config import db
 # TODO code clone
-def create_kubernetes_job(job_name: str, command: List[str], image: str, schedule: Optional[str] = None) -> Union[V1Job, V1CronJob]:
+def create_kubernetes_job(job_name: str, command: List[str], image: str, env: Optional[List[dict]] = None, schedule: Optional[str] = None) -> Union[client.V1Job, client.V1CronJob]:    
     """
     Create a Kubernetes Job or CronJob to run a specific command in a Docker container.
 
@@ -16,23 +16,29 @@ def create_kubernetes_job(job_name: str, command: List[str], image: str, schedul
     :type command: List[str]
     :param image: The Docker image to use for the container.
     :type image: str
+    :param env: Optional. A list of environment variables to set in the container, each represented as a dictionary with 'name' and 'value' keys.
+    :type env: Optional[List[dict]]
     :param schedule: The schedule in Cron format, used only if creating a CronJob. Defaults to None.
     :type schedule: Optional[str]
     :return: The created Kubernetes Job or CronJob object.
     :rtype: Union[V1Job, V1CronJob]
     """
-     # Ensure command is a list of strings
-    assert isinstance(command, List) and all(isinstance(elem, str) for elem in command), \
-        "Command must be a list of strings"
+    #  # Ensure command is a list of strings
+    # assert isinstance(command, List) and all(isinstance(elem, str) for elem in command), \
+    #     "Command must be a list of strings"
     
     # Load the kubeconfig file from the default location or set up in-cluster config
     try:
         config.load_kube_config() # For local development
     except:
         config.load_incluster_config() # For use within a Kubernetes cluster
-
+    command = ["/bin/sh", "-c", command]
     # Define the Kubernetes API client
     api_instance = client.BatchV1Api()
+
+    # Convert environment variables to V1EnvVar objects
+    env_vars = [client.V1EnvVar(name=e['name'], value=e['value']) for e in env] if env else []
+
 
     # Define the container to run
     container = client.V1Container(
@@ -40,6 +46,7 @@ def create_kubernetes_job(job_name: str, command: List[str], image: str, schedul
         image=image,
         command=command
         ,image_pull_policy="IfNotPresent"
+        ,env=env_vars
     )
 
     # Define the template for the job
@@ -175,6 +182,8 @@ def remove_job(job_name: str, is_cronjob: Optional[bool] = False) -> str:
 
 
 # TODO, put all jobs in their own namespace
+from flask import current_app
+
 def get_job_logs(job_name: str, namespace: str = "default") -> str:
     """
     Retrieve logs for all Pods associated with a given Kubernetes Job, with each log line
@@ -194,16 +203,18 @@ def get_job_logs(job_name: str, namespace: str = "default") -> str:
         config.load_incluster_config()  # For use within a Kubernetes cluster
 
     api_instance = client.CoreV1Api()
-
     try:
         # Retrieve all Pods in the namespace
         pods = api_instance.list_namespaced_pod(namespace=namespace, label_selector=f"job-name={job_name}")
         all_logs = []
+
         for pod in pods.items:
             # Retrieve logs for each Pod
+            
             pod_log = api_instance.read_namespaced_pod_log(name=pod.metadata.name, namespace=namespace)
+
             # Insert a header for each Pod's logs
-            all_logs.append(f"Logs for Pod {pod.metadata.name}:\n" + pod_log + "\n\n")
+            all_logs.append(f"Logs for Pod {pod.metadata.name}:\n" + str(pod_log) + "\n\n")
         return "".join(all_logs)
     except ApiException as e:
         if e.status == 404:

@@ -5,6 +5,7 @@ import swagger_server.server_impl.DefaultController_impl as DefaultController_im
 
 
 from swagger_server.models.data_source import DataSource  # noqa: E501
+from swagger_server.models.environment_variable import EnvironmentVariable  # noqa: E501
 from swagger_server.models.error import Error  # noqa: E501
 from swagger_server.models.indexer import Indexer  # noqa: E501
 from swagger_server.models.inline_response200 import InlineResponse200  # noqa: E501
@@ -13,6 +14,32 @@ from swagger_server.models.job import Job  # noqa: E501
 from swagger_server.models.job_configuration import JobConfiguration  # noqa: E501
 from swagger_server.models.record import Record  # noqa: E501
 from swagger_server import util
+
+
+def environment_variables_get():  # noqa: E501
+    """Get environment variables
+
+     # noqa: E501
+
+
+    :rtype: List[EnvironmentVariable]
+    """
+    return DefaultController_impl.environment_variables_get()
+
+
+def environment_variables_post(body):  # noqa: E501
+    """Add new environment variables
+
+     # noqa: E501
+
+    :param body: 
+    :type body: list | bytes
+
+    :rtype: None
+    """
+    if connexion.request.is_json:
+        body = [EnvironmentVariable.from_dict(d) for d in connexion.request.get_json()]  # noqa: E501
+    return DefaultController_impl.environment_variables_post(body)
 
 
 def indexers_get():  # noqa: E501

@@ -1,6 +1,8 @@
 import connexion
 import six
-
+import logging
+import re
+from flask import current_app
 from swagger_server.models.data_source import DataSource  # noqa: E501
 from swagger_server.models.error import Error  # noqa: E501
 from swagger_server.models.indexer import Indexer  # noqa: E501
@@ -9,6 +11,8 @@ from swagger_server.models.job import Job  # noqa: E501
 from swagger_server.models.job_configuration import JobConfiguration  # noqa: E501
 from swagger_server.models.record import Record  # noqa: E501
 from swagger_server import util
+from swagger_server.models.environment_variable import EnvironmentVariable  # noqa: E501
+
 
 import datetime
 import uuid
@@ -18,6 +22,7 @@ from swagger_server.server_impl.rq_config import q
 from swagger_server.server_impl.db_config import db
 from swagger_server.server_impl.k8s_job import create_kubernetes_job, remove_job, get_job_logs
 from flask import jsonify
+
 def indexers_get():  # noqa: E501
     """List all available indexers.
 
@@ -26,7 +31,13 @@ def indexers_get():  # noqa: E501
 
     :rtype: List[Indexer]
     """
-    return 'do some magic!'
+
+    indexers = list(db.indexers.find({}))
+    
+    # Convert MongoDB ObjectId() to string for JSON serialization
+    for indexer in indexers:
+        indexer['_id'] = str(indexer['_id'])
+    return jsonify(indexers)
 
 
 def indexers_indexer_type_data_sources_data_source_id_records_get(indexer_type, data_source_id):  # noqa: E501
@@ -54,8 +65,12 @@ def indexers_indexer_type_data_sources_get(indexer_type):  # noqa: E501
 
     :rtype: List[DataSource]
     """
-    return 'do some magic!'
-
+    data_sources = list(db.data_sources.find({}))
+    
+    # Convert MongoDB ObjectId() to string for JSON serialization
+    for d in data_sources:
+        d['_id'] = str(d['_id'])
+    return jsonify(data_sources)
 
 def jobs_get():  # noqa: E501
     """List the jobs
@@ -152,7 +167,7 @@ def jobs_job_id_request_logs_update_post(job_id):  # noqa: E501
         
         return jsonify({"message": "Logs updated successfully", "logs": logs}), 200
     except Exception as e:
-        print(f"An error occurred while updating logs: {str(e)}")
+        current_app.logger.warn(f"An error occurred while updating logs:{e}")
         error_response = Error(code=500, message=f"An error occurred while updating logs")
         return jsonify(error_response.to_dict()), 500
 
@@ -172,12 +187,26 @@ def jobs_post(body):  # noqa: E501
     if connexion.request.is_json:
         body = connexion.request.get_json()
         command = None
-        
-        if 'command' in body:
-            command = body['command']
-        elif 'jobConfiguration' in body:
-            command = "ls" # TODO convert jobConfiguration to command
+
+        if 'indexerConfiguration' in body:
+            config = body['indexerConfiguration']
+
+            record_option = f"r-{config['record']}" if config['record'] else ''
+            command = f"kb_indexer {config['indexer']['type']} {record_option} {config['pipeline']}".strip()
+
+            command = re.sub(' +', ' ', command)
             body.update({'generatedCommand' : command})
+            logging.getLogger().info(f"Sending job with body: {body}")
+        elif 'command' in body:
+            command = body['command']
+        
+        env = None
+        if 'environment_variables' in body:
+            try :
+                env = body['environment_variables']
+            except Exception as e:
+                print(e)
+                return Error(code=400, message="Invalid environment_variables in request body"), 400
 
         if command:
             job_id = str(uuid.uuid4())
@@ -191,7 +220,7 @@ def jobs_post(body):  # noqa: E501
 
             docker_image = "qcdis/kb-indexer:latest"
             # TODO check if repeat
-            create_kubernetes_job(job_id, [command], docker_image)
+            create_kubernetes_job(job_id, command, docker_image, env)
 
 
 
@@ -201,3 +230,25 @@ def jobs_post(body):  # noqa: E501
     else:
         return Error(code=400, message="Invalid, request body is not json "), 400
 
+def environment_variables_get():
+    """Get environment variables
+
+     # noqa: E501
+
+
+    :rtype: List[EnvironmentVariable]
+    """
+    return jsonify(list( db.environment_variables.find({}, {'_id': 0})))
+
+
+def environment_variables_post(body):
+    """Add new environment variables
+
+     # noqa: E501
+
+    :param body: 
+    :type body: list | bytes
+
+    :rtype: None
+    """
+    for variable in body:db.environment_variables.insert_one(variable)

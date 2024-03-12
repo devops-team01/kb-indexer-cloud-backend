@@ -4,11 +4,11 @@ on:
   push:
     paths:
       - 'src/api.yml'
-      - 'codegen'
+      - 'codegen/**'
   pull_request:
     paths:
       - 'src/api.yml'
-      - 'codegen'
+      - 'codegen/**'
 
 jobs:
   generate-code:

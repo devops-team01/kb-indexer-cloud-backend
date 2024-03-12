@@ -192,6 +192,36 @@ paths:
                 $ref: '#/components/schemas/Error'
       summary: Requests an update to the logs for a specific job without providing a request body.
       x-openapi-router-controller: swagger_server.controllers.default_controller
+  /environment_variables:
+      post:
+        operationId: environment_variables_post
+        summary: Add new environment variables
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EnvironmentVariable'
+        responses:
+          '200':
+            description: Environment variables created
+        x-openapi-router-controller: swagger_server.controllers.default_controller
+      get:
+        operationId: environment_variables_get
+        summary: Get environment variables
+        responses:
+          '200':
+            description: A list of environment variables
+            content:
+              application/json:
+                schema:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/EnvironmentVariable'
+        x-openapi-router-controller: swagger_server.controllers.default_controller
+
 
 
 components:
@@ -289,24 +319,16 @@ components:
       title: Job
       type: object
     JobConfiguration:
-      example:
-        repeat: repeat
-        indexerConfiguration:
-          pipeline: search
-          record:
-            name: name
-            details: ""
-            id: id
-          indexer:
-            id: id
-            type: type
-          dataSource:
-            description: description
-            id: id
-            type: type
-        command: command
-      nullable: true
-      oneOf: []
+      type: object
+      oneOf:
+        - required: [command]
+          properties:
+            command:
+              type: string
+        - required: [indexerConfiguration]
+          properties:
+            indexerConfiguration:
+              $ref: '#/components/schemas/IndexerConfiguration'
       properties:
         command:
           description: Shell command used to run the job
@@ -314,13 +336,8 @@ components:
         indexerConfiguration:
           $ref: '#/components/schemas/IndexerConfiguration'
         repeat:
-          description: "Optional field for how often the task should repeat (e.g.,\
-            \ hourly, daily, weekly)"
+          description: "Optional field for how often the task should repeat (e.g., hourly, daily, weekly)"
           type: string
-      required:
-      - command
-      title: JobConfiguration
-      type: object
     IndexerConfiguration:
       description: "Configuration details if the job uses an indexer, optional dataSource,\
         \ and optional record"
@@ -378,6 +395,15 @@ components:
       - jobId
       title: inline_response_201
       type: object
+      
+    EnvironmentVariable:
+      type: object
+      properties:
+        name:
+          type: string
+        value:
+          type: string
+
   securitySchemes:
     BearerAuth:
       type: http

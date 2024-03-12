@@ -71,8 +71,6 @@ class JobConfiguration(Model):
         :param command: The command of this JobConfiguration.
         :type command: str
         """
-        if command is None:
-            raise ValueError("Invalid value for `command`, must not be `None`")  # noqa: E501
 
         self._command = command
 
