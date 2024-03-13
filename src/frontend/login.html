@@ -25,7 +25,7 @@
             formData.forEach((value, key) => {object[key] = value});
             var json = JSON.stringify(object);
 
-            axios.post(`${basePath}/login`, json, {
+            axios.post(`${basePath}`, json, {
                 headers: {
                     'Content-Type': 'application/json'
                 }
