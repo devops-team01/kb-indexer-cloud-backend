@@ -1,7 +1,7 @@
 from flask import Blueprint, send_from_directory, session, redirect
-
 from flask import Blueprint, request, jsonify, make_response
 from flask_jwt_extended import create_access_token, decode_token
+from flask_jwt_extended.exceptions import JWTDecodeError, JWTExtendedException
 import urllib.parse
 # from werkzeug.security import check_password_hash
 
@@ -14,11 +14,16 @@ def root():
     else:
         # Check if the JWT token is still valid
         try:
-            token = session.get('access_token')
-            decode_token(token)
-            # If decoding succeeds, token is still valid
-            return send_from_directory('./frontend', 'index.html')
-        except (jwt.ExpiredSignatureError, jwt.InvalidTokenError):
+            
+            token = session.get('token')
+            if token:
+                decode_token(token)
+                # If decoding succeeds, token is still valid
+                return send_from_directory('./frontend', 'index.html')
+            else:
+                return redirect(urllib.parse.urljoin(request.base_url, 'login'))
+
+        except (JWTDecodeError, JWTExtendedException):
             # If token is expired or invalid, clear the session and redirect to login
             session.clear()
             
