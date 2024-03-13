@@ -420,6 +420,7 @@ components:
   securitySchemes:
     BearerAuth:
       type: http
+      in: cookie
       scheme: bearer
       bearerFormat: JWT
       x-bearerInfoFunc: swagger_server.controllers.authorization_controller.check_BearerAuth

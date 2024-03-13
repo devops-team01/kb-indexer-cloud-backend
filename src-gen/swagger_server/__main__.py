@@ -6,6 +6,7 @@ from flask_jwt_extended import JWTManager
 
 from flask import redirect, url_for
 
+
 from swagger_server.server_impl.endpoints import main_bp
 from swagger_server.server_impl.db_config import db, insert_initial_values
 
@@ -24,7 +25,6 @@ def main():
     @jwt.unauthorized_loader
     def custom_unauthorized_response(_err):
         return redirect(url_for('main.login'))
-
 
     app.run(port=8080)
 
