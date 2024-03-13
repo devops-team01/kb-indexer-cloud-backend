@@ -10,7 +10,7 @@ main_bp = Blueprint('main', __name__)
 @main_bp.route('/')
 def root():
     if 'logged_in' not in session: 
-        return redirect('/login')
+        return redirect(urllib.parse.urljoin(request.base_url, 'login'))
     else:
         # Check if the JWT token is still valid
         try:
