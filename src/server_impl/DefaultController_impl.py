@@ -220,7 +220,8 @@ def jobs_post(body):  # noqa: E501
 
             docker_image = "qcdis/kb-indexer:latest"
             # TODO check if repeat
-            create_kubernetes_job(job_id, command, docker_image, env)
+            repeat = body["repeat"] if "repeat" in body   else None
+            create_kubernetes_job(job_id, command, docker_image, env, repeat)
 
 
 

@@ -5,6 +5,8 @@ from kubernetes.client.models.v1_job import V1Job
 from kubernetes.client.models.v1_cron_job import V1CronJob
 import time
 from swagger_server.server_impl.db_config import db
+
+from flask import current_app
 # TODO code clone
 def create_kubernetes_job(job_name: str, command: List[str], image: str, env: Optional[List[dict]] = None, schedule: Optional[str] = None) -> Union[client.V1Job, client.V1CronJob]:    
     """
@@ -51,7 +53,7 @@ def create_kubernetes_job(job_name: str, command: List[str], image: str, env: Op
 
     # Define the template for the job
     template = client.V1PodTemplateSpec(
-        metadata=client.V1ObjectMeta(labels={"app": job_name}),
+        metadata=client.V1ObjectMeta(labels={"job_name": job_name}),
         spec=client.V1PodSpec(restart_policy="Never", containers=[container])
     )
 
@@ -60,7 +62,7 @@ def create_kubernetes_job(job_name: str, command: List[str], image: str, env: Op
         job_spec = client.V1JobSpec(template=template)
         cronjob_spec = client.V1CronJobSpec(
             schedule=schedule,
-            job_template=client.V1beta1JobTemplateSpec(spec=job_spec)
+            job_template=client.V1JobTemplateSpec(spec=job_spec)
         )
         job = client.V1CronJob(
             api_version="batch/v1",
@@ -68,7 +70,6 @@ def create_kubernetes_job(job_name: str, command: List[str], image: str, env: Op
             metadata=client.V1ObjectMeta(name=job_name),
             spec=cronjob_spec
         )
-        api_instance = client.BatchV1beta1Api()
         create_func = api_instance.create_namespaced_cron_job
     else:
         # Define the Job spec
@@ -201,14 +202,16 @@ def get_job_logs(job_name: str, namespace: str = "default") -> str:
         config.load_kube_config()  # For local development
     except Exception:
         config.load_incluster_config()  # For use within a Kubernetes cluster
-
+    current_app.logger.warn(f"name = {job_name}")
     api_instance = client.CoreV1Api()
     try:
         # Retrieve all Pods in the namespace
-        pods = api_instance.list_namespaced_pod(namespace=namespace, label_selector=f"job-name={job_name}")
+        pods = api_instance.list_namespaced_pod(namespace=namespace, label_selector=f"job_name={job_name}")
         all_logs = []
+        current_app.logger.warn("searching pods pod")
 
         for pod in pods.items:
+            current_app.logger.warn("found pod")
             # Retrieve logs for each Pod
             
             pod_log = api_instance.read_namespaced_pod_log(name=pod.metadata.name, namespace=namespace)

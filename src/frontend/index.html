@@ -267,8 +267,8 @@ function submitJob() {
 
     // Add repeat information if applicable
     if (repeat) {
-        payload.repeat = repeat;
-        payload.repeatFrequency = repeatFrequency;
+        // payload.repeat = repeat;
+        payload.repeat = repeatFrequency;
     }
 
     axios.post('/jobs', payload, {
