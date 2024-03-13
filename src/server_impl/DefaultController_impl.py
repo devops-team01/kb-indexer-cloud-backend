@@ -252,4 +252,5 @@ def environment_variables_post(body):
 
     :rtype: None
     """
-    for variable in body:db.environment_variables.insert_one(variable)
+    for variable in body:db.environment_variables.insert_one(variable.to_dict())
+    
