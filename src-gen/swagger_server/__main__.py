@@ -21,7 +21,7 @@ def main():
     insert_initial_values(db)
     app.app.register_blueprint(main_bp)
     app.app.config['JWT_TOKEN_LOCATION'] = ['cookies']
-
+    app.app.config['JWT_COOKIE_CSRF_PROTECT'] = False
     @jwt.unauthorized_loader
     def custom_unauthorized_response(_err):
         return redirect(url_for('main.login'))

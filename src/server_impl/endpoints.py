@@ -17,26 +17,6 @@ main_bp = Blueprint('main', __name__)
 def root():
     return send_from_directory('./frontend', 'index.html')
 
-    # if 'logged_in' not in session: 
-    #     return redirect(urllib.parse.urljoin(request.full_path, 'login'))
-    # else:
-    #     # Check if the JWT token is still valid
-    #     try:
-            
-    #         token = session.get('token')
-    #         if token:
-    #             decode_token(token)
-    #             # If decoding succeeds, token is still valid
-    #             return send_from_directory('./frontend', 'index.html')
-    #         else:
-    #             return redirect(urllib.parse.urljoin(request.full_path, 'login'))
-
-    #     except (JWTDecodeError, JWTExtendedException):
-    #         # If token is expired or invalid, clear the session and redirect to login
-    #         session.clear()
-            
-    #         return redirect(urllib.parse.urljoin(request.full_path, 'login'))
-
 @main_bp.route('/login')
 def show_login():
     return send_from_directory('./frontend', 'login.html')
@@ -51,6 +31,7 @@ def login():
         access_token = create_access_token(identity=username)
         # session["token"] = access_token
         response = jsonify({"msg": "login successful"})
+                            # , "access_token":access_token})
         set_access_cookies(response, access_token)
         return response, 200
     else:
