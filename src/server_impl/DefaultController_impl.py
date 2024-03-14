@@ -252,4 +252,10 @@ def environment_variables_post(body):
 
     :rtype: None
     """
-    for variable in body:db.environment_variables.insert_one(variable)
+
+    if connexion.request.is_json:
+        body = connexion.request.get_json()
+        if not isinstance(body, list): 
+            raise f"Post body is no document list: {body}"
+        for variable in body:
+            db.environment_variables.insert_one(variable)

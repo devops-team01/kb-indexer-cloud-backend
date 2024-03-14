@@ -142,5 +142,7 @@ def jobs_post(body):  # noqa: E501
     :rtype: InlineResponse201
     """
     if connexion.request.is_json:
-        body = JobConfiguration.from_dict(connexion.request.get_json())  # noqa: E501
+        json = connexion.request.get_json()
+        print(json)
+        body = JobConfiguration.from_dict(json)  # noqa: E501
     return DefaultController_impl.jobs_post(body)
