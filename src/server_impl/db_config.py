@@ -28,5 +28,5 @@ def insert_initial_values(db):
 
 
     # Truncate environment_variables collection
-    db.environment_variables.delete_many({}) # TODO change this in production
+    # db.environment_variables.delete_many({}) # TODO change this in production
     db.environment_variables.insert_many(env_vars)
