@@ -52,20 +52,7 @@
           <div class="form-group" id="manualFields" style="display: none;">
             <label for="commandInput">Command</label>
             <input type="text" class="form-control" id="commandInput" placeholder="Enter command">
-            <div class="form-check mt-2">
-              <input type="checkbox" class="form-check-input" id="repeatCheck">
-              <label class="form-check-label" for="repeatCheck">Repeat</label>
-            </div>
-            <!-- Repeat options, hidden by default -->
-            <div id="repeatOptions" class="mt-2" style="display: none;">
-              <label for="repeatFrequency">Repeat Frequency</label>
-              <input type="text" class="form-control" id="repeatFrequency" placeholder="0 22 * * 1-5">
-              <small class="form-text text-muted">
-                Need help? Visit <a href="https://crontab.guru" target="_blank">crontab.guru</a> to craft your cron expression.
-              </small>
-              <!-- Placeholder for cronstrue output -->
-              <p id="cronstrueOutput" class="mt-2"></p>
-            </div>
+            
           </div>
 
           <!-- Placeholder for automatic job configuration -->
@@ -73,8 +60,33 @@
             <label for="indexer-type-select">Indexer type</label>
             <select class="form-control" id="indexer-type-select">
             </select>
-            <label for="record-filter">Filter by record (optional)</label>
+            <label for="record-filter">Filter by repository (optional)</label>
             <input type="text" class="form-control" id="record-filter" placeholder="Enter record to index">
+
+            <label for="pipeline-type-select">Pipeline</label>
+            <select class="form-control" id="indexer-type-select">
+                <option value="pipeline">Complete pipeline</option>
+                <option value="search" selected="selected">Only search sources</option>
+                <option value="index" selected="selected">Only do indexing</option>
+            </select>
+            </div>
+
+          <!-- Repeat options -->
+          <div class="form-group" id="repeatFields">
+            <div class="form-check mt-2">
+                <input type="checkbox" class="form-check-input" id="repeatCheck">
+                <label class="form-check-label" for="repeatCheck">Repeat</label>
+            </div>
+            <!-- hidden by default -->
+            <div id="repeatOptions" class="mt-2" style="display: none;">
+                <label for="repeatFrequency">Repeat Frequency</label>
+                <input type="text" class="form-control" id="repeatFrequency" placeholder="0 22 * * 1-5">
+                <small class="form-text text-muted">
+                Need help? Visit <a href="https://crontab.guru" target="_blank">crontab.guru</a> to craft your cron expression.
+                </small>
+                <!-- Placeholder for cronstrue output -->
+                <p id="cronstrueOutput" class="mt-2"></p>
+            </div>
           </div>
         </form>
       </div>
@@ -238,6 +250,7 @@ function submitJob() {
     var jobType = $('#jobType').val();
     var command = $('#commandInput').val();
     var indexer = $('#indexer-type-select').find(':selected').data('indexer');
+    var pipeline = $('#pipeline-type-select').find(':selected').data('pipeline');
     var repeat = $('#repeatCheck').is(':checked');
     var repeatFrequency = $('#repeatFrequency').val();
     var record = $('record-filter').val()
@@ -250,15 +263,14 @@ function submitJob() {
         return { name: parts[0].trim(), value: parts.slice(1).join('=').trim() };
     });
 
-
     // Construct job payload
     var payload = {environment_variables: envVars};
 
     if (jobType == 'auto') {
         payload.indexerConfiguration = {
                     indexer: indexer,
-                    record: {name: record, id: record, details: {}},
-                    pipeline: 'pipeline'
+                    record: record,
+                    pipeline: pipeline
                 }
     }
     else {
