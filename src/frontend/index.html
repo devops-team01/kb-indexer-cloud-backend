@@ -266,7 +266,7 @@ function submitJob() {
     });
 
     // Construct job payload
-    var payload = {environment_variables: envVars};
+    var payload = {environmentVariables: envVars};
 
     if (jobType == 'auto') {
         payload.indexerConfiguration = {
