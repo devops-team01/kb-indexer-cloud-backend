@@ -189,7 +189,7 @@ def jobs_post(body):  # noqa: E501
         if 'indexerConfiguration' in body:
             config = body['indexerConfiguration']
 
-            record_option = f"r- {config['record']}" if config['record'] else ''
+            record_option = f"-r {config['record']}" if config['record'] else ''
             command = f"kb_indexer {config['indexer']['type']} {record_option} {config['pipeline']}".strip()
 
             command = re.sub(' +', ' ', command)
@@ -237,7 +237,7 @@ def environment_variables_get():
 
     :rtype: List[EnvironmentVariable]
     """
-    return jsonify(list( db.environment_variables.find({}, {'_id': 0})))
+    return jsonify(list( db.environment_variables.find({})))
 
 
 def environment_variables_post(body):
@@ -256,4 +256,9 @@ def environment_variables_post(body):
         if not isinstance(body, list): 
             raise f"Post body is no document list: {body}"
         for variable in body:
-            db.environment_variables.insert_one(variable)
+            variable["_id"] = variable['name']
+            filt = {"_id": variable["_id"]}
+            if db.environment_variables.find(filt, limit = 1) != 0:
+                db.environment_variables.update_one(filt, {"$set": variable})
+            else:
+                db.environment_variables.insert_one(variable)

@@ -16,7 +16,7 @@
 <div class="container mt-5">
     <h2>Job Management</h2>
     <button class="btn btn-primary mb-3 float-right" id="createJobBtn">Create Job</button>
-    <button class="btn btn-secondary mb-3 ml-2" id="setVariablesBtn">Set Variables</button>
+    <button class="btn btn-secondary mb-3 ml-2" id="setVariablesBtn">Set Default Environment Variables</button>
     <div id="jobsList" class="mt-3"></div>
 </div>
 
@@ -64,10 +64,10 @@
             <input type="text" class="form-control" id="record-filter" placeholder="Enter record to index">
 
             <label for="pipeline-type-select">Pipeline</label>
-            <select class="form-control" id="indexer-type-select">
-                <option value="pipeline">Complete pipeline</option>
-                <option value="search" selected="selected">Only search sources</option>
-                <option value="index" selected="selected">Only do indexing</option>
+            <select class="form-control" id="pipeline-type-select">
+                <option value="pipeline" selected>Complete pipeline</option>
+                <option value="search">Only search sources</option>
+                <option value="index">Only do indexing</option>
             </select>
             </div>
 
@@ -103,7 +103,7 @@
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="setVariablesModalLabel">Set Environment Variables</h5>
+          <h5 class="modal-title" id="setVariablesModalLabel">Set Default Environment Variables</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
@@ -250,10 +250,12 @@ function submitJob() {
     var jobType = $('#jobType').val();
     var command = $('#commandInput').val();
     var indexer = $('#indexer-type-select').find(':selected').data('indexer');
-    var pipeline = $('#pipeline-type-select').find(':selected').data('pipeline');
+    var pipeline = $('#pipeline-type-select').find(':selected').val();
     var repeat = $('#repeatCheck').is(':checked');
     var repeatFrequency = $('#repeatFrequency').val();
-    var record = $('record-filter').val()
+    var record = $('#record-filter').val()
+
+    console.log("Record: ", record)
 
     var envVarsText = $('#jobEnvVars').val();
 

@@ -22,6 +22,10 @@ def insert_initial_values(db):
         {"name": "KAGGLE_KEY", "value": "<A Kaggle API key>"},
         {"name": "GITHUB_API_TOKEN", "value": "<A GitHub API token>"}
     ]
+                                                                                        
+    # Correctly set primary key
+    env_vars = [{**v, **{"_id": v['name']}} for v in env_vars]
+
 
     # Truncate environment_variables collection
     db.environment_variables.delete_many({}) # TODO change this in production
