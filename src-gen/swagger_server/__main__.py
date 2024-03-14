@@ -8,7 +8,11 @@ from swagger_server.server_impl.endpoints import main_bp
 from swagger_server.server_impl.db_config import db, insert_initial_values
 
 def main():
-    app = connexion.App(__name__, specification_dir='./swagger/')
+    app = connexion.App(__name__,
+                        specification_dir='./swagger/',
+                        server_args={
+                        "static_url_path":'', 
+                        "static_folder":'./frontend/'})
     app.app.json_encoder = encoder.JSONEncoder
     app.add_api('swagger.yaml', arguments={'title': 'kb-indexer API'}, pythonic_params=True)
     

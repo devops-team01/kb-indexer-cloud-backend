@@ -1,4 +1,4 @@
-from flask import Blueprint, send_from_directory, session, redirect
+from flask import Blueprint, send_from_directory, session, redirect, url_for
 
 from flask import Blueprint, request, jsonify, make_response
 from flask_jwt_extended import create_access_token
@@ -9,8 +9,8 @@ main_bp = Blueprint('main', __name__)
 @main_bp.route('/')
 def root():
     if 'logged_in' not in session: 
-        return redirect('/login')
-    return send_from_directory('./frontend', 'index.html')
+        return redirect(url_for("main_bp.login"))
+    return send_from_directory('./frontend', 'dashboard.html')
 
 @main_bp.route('/login')
 def show_login():
