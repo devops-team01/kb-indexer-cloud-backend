@@ -44,6 +44,29 @@ class Error(Model):
         :rtype: Error
         """
         return util.deserialize_model(dikt, cls)
+    
+    @classmethod
+    def to_dict(self):
+            """Converts this instance to a dictionary."""
+            result = {}
+            for attr, _ in self.swagger_types.items():
+                value = getattr(self, attr)
+                if isinstance(value, list):
+                    result[self.attribute_map[attr]] = list(map(
+                        lambda x: x.to_dict() if hasattr(x, "to_dict") else x,
+                        value
+                    ))
+                elif hasattr(value, "to_dict"):
+                    result[self.attribute_map[attr]] = value.to_dict()
+                elif isinstance(value, dict):
+                    result[self.attribute_map[attr]] = dict(map(
+                        lambda item: (item[0], item[1].to_dict()) if hasattr(item[1], "to_dict") else item,
+                        value.items()
+                    ))
+                else:
+                    result[self.attribute_map[attr]] = value
+            return result
+
 
     @property
     def code(self) -> int:
