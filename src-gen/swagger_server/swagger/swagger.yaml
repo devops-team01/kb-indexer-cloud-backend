@@ -74,7 +74,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Record'
+                  type: string
                 x-content-type: application/json
       x-openapi-router-controller: swagger_server.controllers.default_controller
   /jobs:
@@ -252,24 +252,6 @@ components:
         description: description
         id: id
         type: type
-    Record:
-      title: Record
-      type: object
-      properties:
-        id:
-          type: string
-          description: Unique identifier for the record
-        name:
-          type: string
-          description: Name of the record
-        details:
-          type: object
-          additionalProperties: true
-          description: Detailed information about the record
-      example:
-        name: name
-        details: ""
-        id: id
     Job:
       title: Job
       required:
@@ -298,15 +280,8 @@ components:
           repeat: repeat
           indexerConfiguration:
             pipeline: search
-            record:
-              name: name
-              details: ""
-              id: id
+            record: Kaggle
             indexer:
-              id: id
-              type: type
-            dataSource:
-              description: description
               id: id
               type: type
           command: command
@@ -321,6 +296,11 @@ components:
           description: Shell command used to run the job
         indexerConfiguration:
           $ref: '#/components/schemas/IndexerConfiguration'
+        environmentVariables:
+          type: array
+          description: Add environment variables for the job
+          items:
+            $ref: '#/components/schemas/EnvironmentVariable'
         repeat:
           type: string
           description: "Optional field for how often the task should repeat (e.g.,\
@@ -342,10 +322,8 @@ components:
       properties:
         indexer:
           $ref: '#/components/schemas/Indexer'
-        dataSource:
-          $ref: '#/components/schemas/DataSource'
         record:
-          $ref: '#/components/schemas/Record'
+          type: string
         pipeline:
           type: string
           description: "Which pipeline to run (search, index, or pipeline)"
@@ -353,19 +331,12 @@ components:
           - search
           - index
           - pipeline
-      description: "Configuration details if the job uses an indexer, optional dataSource,\
-        \ and optional record"
+      description: Configuration details if the job uses an indexer  and optional
+        record
       example:
         pipeline: search
-        record:
-          name: name
-          details: ""
-          id: id
+        record: test
         indexer:
-          id: id
-          type: type
-        dataSource:
-          description: description
           id: id
           type: type
     Error:

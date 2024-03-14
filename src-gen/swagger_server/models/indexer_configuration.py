@@ -6,9 +6,7 @@ from datetime import date, datetime  # noqa: F401
 from typing import List, Dict  # noqa: F401
 
 from swagger_server.models.base_model_ import Model
-from swagger_server.models.data_source import DataSource  # noqa: F401,E501
 from swagger_server.models.indexer import Indexer  # noqa: F401,E501
-from swagger_server.models.record import Record  # noqa: F401,E501
 from swagger_server import util
 
 
@@ -17,33 +15,28 @@ class IndexerConfiguration(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, indexer: Indexer=None, data_source: DataSource=None, record: Record=None, pipeline: str=None):  # noqa: E501
+    def __init__(self, indexer: Indexer=None, record: str=None, pipeline: str=None):  # noqa: E501
         """IndexerConfiguration - a model defined in Swagger
 
         :param indexer: The indexer of this IndexerConfiguration.  # noqa: E501
         :type indexer: Indexer
-        :param data_source: The data_source of this IndexerConfiguration.  # noqa: E501
-        :type data_source: DataSource
         :param record: The record of this IndexerConfiguration.  # noqa: E501
-        :type record: Record
+        :type record: str
         :param pipeline: The pipeline of this IndexerConfiguration.  # noqa: E501
         :type pipeline: str
         """
         self.swagger_types = {
             'indexer': Indexer,
-            'data_source': DataSource,
-            'record': Record,
+            'record': str,
             'pipeline': str
         }
 
         self.attribute_map = {
             'indexer': 'indexer',
-            'data_source': 'dataSource',
             'record': 'record',
             'pipeline': 'pipeline'
         }
         self._indexer = indexer
-        self._data_source = data_source
         self._record = record
         self._pipeline = pipeline
 
@@ -103,43 +96,22 @@ class IndexerConfiguration(Model):
         self._indexer = indexer
 
     @property
-    def data_source(self) -> DataSource:
-        """Gets the data_source of this IndexerConfiguration.
-
-
-        :return: The data_source of this IndexerConfiguration.
-        :rtype: DataSource
-        """
-        return self._data_source
-
-    @data_source.setter
-    def data_source(self, data_source: DataSource):
-        """Sets the data_source of this IndexerConfiguration.
-
-
-        :param data_source: The data_source of this IndexerConfiguration.
-        :type data_source: DataSource
-        """
-
-        self._data_source = data_source
-
-    @property
-    def record(self) -> Record:
+    def record(self) -> str:
         """Gets the record of this IndexerConfiguration.
 
 
         :return: The record of this IndexerConfiguration.
-        :rtype: Record
+        :rtype: str
         """
         return self._record
 
     @record.setter
-    def record(self, record: Record):
+    def record(self, record: str):
         """Sets the record of this IndexerConfiguration.
 
 
         :param record: The record of this IndexerConfiguration.
-        :type record: Record
+        :type record: str
         """
 
         self._record = record
