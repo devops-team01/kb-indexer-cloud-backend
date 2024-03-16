@@ -9,7 +9,7 @@ main_bp = Blueprint('main', __name__)
 @main_bp.route('/')
 def root():
     if 'logged_in' not in session: 
-        return redirect(url_for("main_bp.login"))
+        return redirect(url_for("main.login"))
     return send_from_directory('./frontend', 'dashboard.html')
 
 @main_bp.route('/login')
