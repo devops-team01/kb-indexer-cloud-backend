@@ -71,7 +71,7 @@ paths:
             application/json:
               schema:
                 items:
-                  $ref: '#/components/schemas/Record'
+                  type: string
                 type: array
                 x-content-type: application/json
           description: Successfully listed records for the data source
@@ -257,24 +257,6 @@ components:
           type: string
       title: DataSource
       type: object
-    Record:
-      example:
-        name: name
-        details: ""
-        id: id
-      properties:
-        id:
-          description: Unique identifier for the record
-          type: string
-        name:
-          description: Name of the record
-          type: string
-        details:
-          additionalProperties: true
-          description: Detailed information about the record
-          type: object
-      title: Record
-      type: object
     Job:
       example:
         jobId: 507f1f77bcf86cd799439014
@@ -282,15 +264,8 @@ components:
           repeat: repeat
           indexerConfiguration:
             pipeline: search
-            record:
-              name: name
-              details: ""
-              id: id
+            record: Kaggle
             indexer:
-              id: id
-              type: type
-            dataSource:
-              description: description
               id: id
               type: type
           command: command
@@ -335,32 +310,28 @@ components:
           type: string
         indexerConfiguration:
           $ref: '#/components/schemas/IndexerConfiguration'
+        environmentVariables:
+          description: "Add environment variables for the job"
+          type: array
+          items:
+            $ref: '#/components/schemas/EnvironmentVariable'
         repeat:
           description: "Optional field for how often the task should repeat (e.g., hourly, daily, weekly)"
           type: string
     IndexerConfiguration:
-      description: "Configuration details if the job uses an indexer, optional dataSource,\
+      description: "Configuration details if the job uses an indexer
         \ and optional record"
       example:
         pipeline: search
-        record:
-          name: name
-          details: ""
-          id: id
+        record: test
         indexer:
-          id: id
-          type: type
-        dataSource:
-          description: description
           id: id
           type: type
       properties:
         indexer:
           $ref: '#/components/schemas/Indexer'
-        dataSource:
-          $ref: '#/components/schemas/DataSource'
         record:
-          $ref: '#/components/schemas/Record'
+          type: string
         pipeline:
           description: "Which pipeline to run (search, index, or pipeline)"
           enum:

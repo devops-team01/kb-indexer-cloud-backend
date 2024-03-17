@@ -8,6 +8,7 @@ from flask_jwt_extended import jwt_required, create_access_token, decode_token, 
 from flask_jwt_extended.exceptions import JWTDecodeError, JWTExtendedException
 import urllib.parse
 
+import os
 # from werkzeug.security import check_password_hash
 
 main_bp = Blueprint('main', __name__)
@@ -15,7 +16,7 @@ main_bp = Blueprint('main', __name__)
 @main_bp.route('/')
 @jwt_required()
 def root():
-    return send_from_directory('./frontend', 'index.html')
+    return send_from_directory('./frontend', 'dashboard.html')
 
 @main_bp.route('/login')
 def show_login():
@@ -23,17 +24,18 @@ def show_login():
 
 @main_bp.route('/login', methods=['POST'])
 def login():
-    username = request.form.get('username')
-    password = request.form.get('password')
+    data = request.get_json()
+    username = data.get('username')
+    password = data.get('password')
     
-    if username == password: 
-        # session["logged_in"] = True
+    # __main__.py asserts these are present 
+    if username  == os.getenv('DASHBOARD_USERNAME') and password == os.getenv('DASHBOARD_PASSWORD'):
+        #session["logged_in"] = True
+
         access_token = create_access_token(identity=username)
-        # session["token"] = access_token
-        response = jsonify({"msg": "login successful"})
-                            # , "access_token":access_token})
         set_access_cookies(response, access_token)
-        return response, 200
+	response = jsonify(access_token=access_token)
+	return response, 200
     else:
         return make_response('Invalid username or password', 401)
     

@@ -1,2 +1,2 @@
-the src-gen directory contains symlinks to src, so use tar -czh . | docker build - to dereference symlinks 
+The src-gen directory contains symlinks to src, so use tar -czh . | docker build - to dereference symlinks 
 see: https://superuser.com/questions/842642/how-to-make-a-symlinked-folder-appear-as-a-normal-folder

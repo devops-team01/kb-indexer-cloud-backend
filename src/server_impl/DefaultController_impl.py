@@ -181,8 +181,6 @@ def jobs_post(body):  # noqa: E501
 
     :rtype: InlineResponse201
     """
-    # if connexion.request.is_json:
-    #     body = JobConfiguration.from_dict(connexion.request.get_json())  # noqa: E501
             
     if connexion.request.is_json:
         body = connexion.request.get_json()
@@ -191,7 +189,7 @@ def jobs_post(body):  # noqa: E501
         if 'indexerConfiguration' in body:
             config = body['indexerConfiguration']
 
-            record_option = f"r-{config['record']}" if config['record'] else ''
+            record_option = f"-r {config['record']}" if config['record'] else ''
             command = f"kb_indexer {config['indexer']['type']} {record_option} {config['pipeline']}".strip()
 
             command = re.sub(' +', ' ', command)
@@ -201,12 +199,12 @@ def jobs_post(body):  # noqa: E501
             command = body['command']
         
         env = None
-        if 'environment_variables' in body:
+        if 'environmentVariables' in body:
             try :
-                env = body['environment_variables']
+                env = body['environmentVariables']
             except Exception as e:
                 print(e)
-                return Error(code=400, message="Invalid environment_variables in request body"), 400
+                return Error(code=400, message="Invalid environmentVariables in request body"), 400
 
         if command:
             job_id = str(uuid.uuid4())
@@ -239,7 +237,7 @@ def environment_variables_get():
 
     :rtype: List[EnvironmentVariable]
     """
-    return jsonify(list( db.environment_variables.find({}, {'_id': 0})))
+    return jsonify(list( db.environment_variables.find({})))
 
 
 def environment_variables_post(body):
@@ -252,4 +250,15 @@ def environment_variables_post(body):
 
     :rtype: None
     """
-    for variable in body:db.environment_variables.insert_one(variable)
+
+    if connexion.request.is_json:
+        body = connexion.request.get_json()
+        if not isinstance(body, list): 
+            raise f"Post body is no document list: {body}"
+        for variable in body:
+            variable["_id"] = variable['name']
+            filt = {"_id": variable["_id"]}
+            if db.environment_variables.find(filt, limit = 1) != 0:
+                db.environment_variables.update_one(filt, {"$set": variable})
+            else:
+                db.environment_variables.insert_one(variable)

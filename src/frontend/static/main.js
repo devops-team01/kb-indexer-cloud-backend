@@ -1,128 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Knowledge Base Indexer: Job Management Interface</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <!-- Bootstrap JS -->
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"> <!-- Font Awesome CDN -->
-    <script src="https://unpkg.com/cronstrue@2.48.0/dist/cronstrue.min.js" async></script>
-</head>
-<body>
-<div class="container mt-5">
-    <h2>Job Management</h2>
-    <button class="btn btn-primary mb-3 float-right" id="createJobBtn">Create Job</button>
-    <button class="btn btn-secondary mb-3 ml-2" id="setVariablesBtn">Set Default Environment Variables</button>
-    <div id="jobsList" class="mt-3"></div>
-</div>
-
-<!-- Create Job Modal -->
-<div class="modal fade" id="createJobModal" tabindex="-1" role="dialog" aria-labelledby="createJobModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="createJobModalLabel">Create New Job</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <form id="createJobForm">
-            <!-- Environment Variables Collapsible Panel -->
-            <div class="form-group">
-                <a data-toggle="collapse" href="#envVarsCollapse" role="button" aria-expanded="false" aria-controls="envVarsCollapse">
-                    <i class="fas fa-chevron-down"></i> Environment Variables (Optional)
-                </a>
-                <div class="collapse" id="envVarsCollapse">
-                    <textarea class="form-control mt-2" id="jobEnvVars" rows="5" placeholder="Customize environment variables for this job"></textarea>
-                </div>
-            </div>
-
-          <div class="form-group">
-            <label for="jobType">Job Type</label>
-            <select class="form-control" id="jobType">
-              <option value="manual">Command</option>
-              <option value="auto" selected="selected">Choose indexer</option>
-            </select>
-          </div>
-          <div class="form-group" id="manualFields" style="display: none;">
-            <label for="commandInput">Command</label>
-            <input type="text" class="form-control" id="commandInput" placeholder="Enter command">
-            
-          </div>
-
-          <!-- Placeholder for automatic job configuration -->
-          <div class="form-group" id="autoFields">
-            <label for="indexer-type-select">Indexer type</label>
-            <select class="form-control" id="indexer-type-select">
-            </select>
-            <label for="record-filter">Filter by repository (optional)</label>
-            <input type="text" class="form-control" id="record-filter" placeholder="Enter record to index">
-
-            <label for="pipeline-type-select">Pipeline</label>
-            <select class="form-control" id="pipeline-type-select">
-                <option value="pipeline" selected>Complete pipeline</option>
-                <option value="search">Only search sources</option>
-                <option value="index">Only do indexing</option>
-            </select>
-            </div>
-
-          <!-- Repeat options -->
-          <div class="form-group" id="repeatFields">
-            <div class="form-check mt-2">
-                <input type="checkbox" class="form-check-input" id="repeatCheck">
-                <label class="form-check-label" for="repeatCheck">Repeat</label>
-            </div>
-            <!-- hidden by default -->
-            <div id="repeatOptions" class="mt-2" style="display: none;">
-                <label for="repeatFrequency">Repeat Frequency</label>
-                <input type="text" class="form-control" id="repeatFrequency" placeholder="0 22 * * 1-5">
-                <small class="form-text text-muted">
-                Need help? Visit <a href="https://crontab.guru" target="_blank">crontab.guru</a> to craft your cron expression.
-                </small>
-                <!-- Placeholder for cronstrue output -->
-                <p id="cronstrueOutput" class="mt-2"></p>
-            </div>
-          </div>
-        </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary" id="submitJob">Submit Job</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Environment Variables Modal -->
-<div class="modal fade" id="setVariablesModal" tabindex="-1" role="dialog" aria-labelledby="setVariablesModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="setVariablesModalLabel">Set Default Environment Variables</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <form id="setVariablesForm">
-            <textarea class="form-control" id="variablesText" rows="10" placeholder="VAR_NAME=value\nAnother_VAR=another value"></textarea>
-          </form>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary" id="updateVariables">Update</button>
-        </div>
-      </div>
-    </div>
-</div>
-  
-
-<script>
 $(document).ready(function() {
     // Load jobs
     loadJobs();
@@ -169,26 +44,46 @@ $(document).ready(function() {
         jobsList.empty(); // Clear current list
         response.data.forEach(function(job) {
             var jobElement = $(`
-                <div class="card mt-2">
+                <div class="card border-orange border-1">
                     <div class="card-body">
                         <div class="row">
                             <!-- Job Info and Actions -->
                             <div class="col-md-6">
-                                <h5 class="card-title">Job ID: ${job._id}</h5>
-                                <p class="card-text">Status: ${job.status}</p>
-                                <button class="btn btn-danger btn-sm delete-job" data-job-id="${job._id}">Delete</button>
-                                <button class="btn btn-warning btn-sm request-update ml-2" data-job-id="${job._id}">Update Logs</button>
+                                <div class="card-header card-title">
+                                    <h4 class="mb-0">Job Task: <em>${job.generatedCommand || job.command || ''}</em></h4>
+                                </div>
+                                <div class="card-text">
+                                <span class="text-muted">Job ID: ${job._id} </span>
+                                <p>
+                                    Status: ${job.status}</div>
+                                    Created: ${beforeNow(job.creationTimestamp)}
+                                </p>
+                                
                             </div>
                             <!-- Log Display -->
                             <div class="col-md-6">
-                                <div class="logs-container" style="max-height: 200px; overflow-y: auto;">
-                                    ${job.logs ? `<pre>${job.logs}</pre>` : '<p>No logs available</p>'}
+                                <h4>Logs:</h4>
+                                <div class="logs-container mt-3 p-3 card-hover" style="max-height: 200px; overflow-y: auto;">
+                                    ${job.logs ? `<pre>${job.logs}</pre>` : '<pre>No logs available</pre>'}
                                 </div>
                             </div>
+                        </div>
+                        <div class="card-actions mt-3">
+                            <button class="btn btn-outline-danger delete-job" data-job-id="${job._id}">Delete</button>
+                            <button class="btn btn-warning request-update ml-2" data-job-id="${job._id}">Update Logs</button>
                         </div>
                     </div>`);
                 jobsList.append(jobElement);
             });
+            completed = response.data.filter((x) => x.status == 'Completed')
+            failed = response.data.filter((x) => x.status == 'Failed')
+            console.log(completed, failed);
+            console.log($('#totalCount'));
+            console.log(response.data.length);
+            document.getElementById('totalCount').innerHTML = response.data.length;
+            document.getElementById('completedCount').innerHTML = completed.length;
+            document.getElementById('failedCount').innerHTML = failed.length;
+
             attachDeleteEvent();
             attachRequestUpdateEvent(); 
         })
@@ -438,7 +333,3 @@ function encodeHTML(str){
     return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
-
-</script>
-</body>
-</html>

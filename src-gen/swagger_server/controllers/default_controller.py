@@ -12,7 +12,6 @@ from swagger_server.models.inline_response200 import InlineResponse200  # noqa: 
 from swagger_server.models.inline_response201 import InlineResponse201  # noqa: E501
 from swagger_server.models.job import Job  # noqa: E501
 from swagger_server.models.job_configuration import JobConfiguration  # noqa: E501
-from swagger_server.models.record import Record  # noqa: E501
 from swagger_server import util
 
 
@@ -63,7 +62,7 @@ def indexers_indexer_type_data_sources_data_source_id_records_get(indexer_type, 
     :param data_source_id: 
     :type data_source_id: str
 
-    :rtype: List[Record]
+    :rtype: List[str]
     """
     return DefaultController_impl.indexers_indexer_type_data_sources_data_source_id_records_get(indexer_type, data_source_id)
 
