@@ -8,9 +8,7 @@
 import connexion
 from {{packageName}} import encoder
 from flask_jwt_extended import JWTManager
-
 from flask import redirect, url_for
-
 
 from swagger_server.server_impl.endpoints import main_bp
 from swagger_server.server_impl.db_config import db, insert_initial_values
