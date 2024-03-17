@@ -7,6 +7,7 @@ from flask_jwt_extended import JWTManager
 from swagger_server.server_impl.endpoints import main_bp
 from swagger_server.server_impl.db_config import db, insert_initial_values
 
+from flask import redirect, url_for
 import os
 
 def main():
