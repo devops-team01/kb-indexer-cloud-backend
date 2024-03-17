@@ -3,11 +3,11 @@
 import connexion
 from swagger_server import encoder
 from flask_jwt_extended import JWTManager
+from flask import redirect, url_for
 
 from swagger_server.server_impl.endpoints import main_bp
 from swagger_server.server_impl.db_config import db, insert_initial_values
 
-from flask import redirect, url_for
 import os
 
 def main():
@@ -27,6 +27,8 @@ def main():
     app.app.register_blueprint(main_bp)
     app.app.config['JWT_TOKEN_LOCATION'] = ['cookies']
     app.app.config['JWT_COOKIE_CSRF_PROTECT'] = False
+
+
     @jwt.unauthorized_loader
     def custom_unauthorized_response(_err):
         return redirect(url_for('main.login'))
